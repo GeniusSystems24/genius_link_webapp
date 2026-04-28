@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Invoice List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8;--surface:#fff;--surface-2:#f0f2f6;--surface-3:#e7eaf0;
+  --border:#e3e6ec;--border-strong:#d3d8e1;
+  --text:#0f1525;--text-muted:#5d6478;--text-dim:#8a90a1;
+  --primary:#2d5bff;--primary-soft:#e5ecff;--primary-ink:#1d3fbf;
+  --success:#16a34a;--success-soft:#dff7e5;--success-ink:#0c6b33;
+  --danger:#dc2626;--danger-soft:#fde2e2;--danger-ink:#971818;
+  --amber:#c68b00;--amber-soft:#fdedc8;--amber-ink:#7f5700;
+  --purple:#7c3aed;--purple-soft:#ede9fe;--purple-ink:#4c1d95;
+  --shadow-sm:0 1px 2px rgba(15,21,37,.04);
+  --shadow-md:0 4px 16px -4px rgba(15,21,37,.10);
+  --ring:0 0 0 3px rgba(45,91,255,.18);
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;--accent:#2d5bff;
+}
+html[data-theme="dark"]{
+  --bg:#0a0d14;--surface:#111523;--surface-2:#151a2b;--surface-3:#1c2238;
+  --border:#212741;--border-strong:#2c345a;
+  --text:#e8eaf2;--text-muted:#9aa0b8;--text-dim:#6b7291;
+  --primary:#5b7bff;--primary-soft:#1b2550;--primary-ink:#a8b7ff;
+  --success:#22c55e;--success-soft:#102a1c;--success-ink:#4ade80;
+  --danger:#ef4444;--danger-soft:#2a1416;--danger-ink:#fca5a5;
+  --amber:#eab308;--amber-soft:#2a2112;--amber-ink:#fde68a;
+  --purple:#a78bfa;--purple-soft:#2e1065;--purple-ink:#ddd6fe;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);--shadow-md:0 4px 24px -4px rgba(0,0,0,.5);
+  --ring:0 0 0 3px rgba(91,123,255,.25);--accent:#7890ff;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.4}
+html[dir="rtl"] body{font-family:'Cairo',system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+
+/* topbar */
+.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;color:var(--text)}
+.brand-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--primary),#7890ff);display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.crumbs{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
+.crumbs a{color:var(--text-muted);text-decoration:none;font-weight:500}.crumbs a:hover{color:var(--text)}
+.topbar-spacer{flex:1}
+.theme-toggle,.lang-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);cursor:pointer;color:var(--text-muted);font-size:12px;font-weight:700;font:inherit}
+.theme-toggle:hover,.lang-toggle:hover{color:var(--text);border-color:var(--border-strong)}
+.view-toggle{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px}
+.view-toggle button{appearance:none;border:0;background:transparent;color:var(--text-muted);font:inherit;padding:5px 12px;border-radius:999px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.view-toggle button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+
+/* page */
+.page{padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.page-head h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0}
+.page-head .sub{color:var(--text-muted);font-size:13px;margin-top:5px}
+
+/* stats strip */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px}
+.stat-cell{background:var(--surface);padding:16px 20px;display:flex;flex-direction:column;gap:4px}
+.stat-cell .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+.stat-cell .val{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-cell .trend{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.stat-cell.danger .val{color:var(--danger)}
+.stat-cell.success .val{color:var(--success)}
+.stat-cell.primary .val{color:var(--primary)}
+
+/* filters bar */
+.filters{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:220px}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 12px 9px 36px;font:inherit;font-size:13.5px}
+.search-wrap input:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-dim)}
+html[dir="rtl"] .search-wrap input{padding:9px 36px 9px 12px}
+html[dir="rtl"] .search-wrap svg{left:auto;right:11px}
+.filter-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text-muted);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.filter-btn:hover{border-color:var(--border-strong);color:var(--text)}
+.filter-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
+.filter-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent}
+.filter-chip.all{background:var(--primary);color:#fff}
+.filter-chip.partial{background:var(--amber-soft);color:var(--amber-ink);border-color:var(--amber)}
+.filter-chip.paid{background:var(--success-soft);color:var(--success-ink);border-color:var(--success)}
+.filter-chip.overdue{background:var(--danger-soft);color:var(--danger-ink);border-color:var(--danger)}
+.filter-chip.draft{background:var(--surface-3);color:var(--text-muted);border-color:var(--border-strong)}
+.filter-chip.voided{background:var(--surface-3);color:var(--text-dim);border-color:var(--border)}
+
+/* table */
+.inv-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.inv-thead{display:grid;grid-template-columns:120px 1.8fr 1fr 90px 1fr 1fr 1fr 110px 44px;gap:0;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.inv-thead .th{padding:10px 14px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;white-space:nowrap}
+.inv-thead .th:hover{color:var(--text)}
+.th .sort{opacity:.4;font-size:10px}
+.th.sorted{color:var(--primary)}.th.sorted .sort{opacity:1;color:var(--primary)}
+.inv-row{display:grid;grid-template-columns:120px 1.8fr 1fr 90px 1fr 1fr 1fr 110px 44px;gap:0;border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer;align-items:center}
+.inv-row:last-child{border-bottom:0}
+.inv-row:hover{background:var(--surface-2)}
+.inv-row .td{padding:12px 14px;font-size:13px;min-width:0}
+.inv-ref{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;color:var(--primary)}
+.inv-cust{display:flex;align-items:center;gap:9px;min-width:0}
+.cust-av{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;flex:none}
+.cust-nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cust-id{color:var(--text-dim);font-size:11.5px}
+.inv-type{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600}
+.inv-type.cash{background:var(--success-soft);color:var(--success-ink)}
+.inv-type.installment{background:var(--purple-soft);color:var(--purple-ink)}
+.inv-type.credit{background:var(--primary-soft);color:var(--primary-ink)}
+.inv-type.advance{background:var(--amber-soft);color:var(--amber-ink)}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:600}
+.status-badge .dot{width:6px;height:6px;border-radius:50%}
+.status-badge.paid{background:var(--success-soft);color:var(--success-ink)}.status-badge.paid .dot{background:var(--success)}
+.status-badge.partial{background:var(--amber-soft);color:var(--amber-ink)}.status-badge.partial .dot{background:var(--amber)}
+.status-badge.overdue{background:var(--danger-soft);color:var(--danger-ink)}.status-badge.overdue .dot{background:var(--danger)}
+.status-badge.draft{background:var(--surface-3);color:var(--text-muted)}.status-badge.draft .dot{background:var(--text-dim)}
+.status-badge.voided{background:var(--surface-3);color:var(--text-dim)}.status-badge.voided .dot{background:var(--text-dim)}
+.amt{font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
+.amt.pos{color:var(--success)}.amt.neg{color:var(--danger)}.amt.muted{color:var(--text-muted)}
+.mini-bar{width:60px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:4px}
+.mini-bar-fill{height:100%;border-radius:3px;background:var(--success)}
+.row-actions{display:flex;gap:2px;justify-content:flex-end}
+.icon-btn{appearance:none;border:0;background:transparent;color:var(--text-dim);width:28px;height:28px;border-radius:7px;cursor:pointer;display:inline-grid;place-items:center}
+.icon-btn:hover{background:var(--surface-2);color:var(--text)}
+
+/* pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted)}
+.pag-btns{display:flex;gap:4px}
+.pag-btn{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);width:32px;height:32px;border-radius:8px;cursor:pointer;display:grid;place-items:center;font:inherit;font-size:13px;font-weight:600}
+.pag-btn:hover{background:var(--surface-2);color:var(--text)}
+.pag-btn.active{background:var(--primary);color:#fff;border-color:transparent}
+
+/* btn */
+.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:10px;display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);transition:background .15s}
+.btn:hover{background:var(--surface-3)}
+.btn.primary{background:var(--primary);color:#fff;border-color:transparent;box-shadow:0 6px 16px -6px rgba(45,91,255,.45)}
+.btn.primary:hover{background:#2148e5}
+.btn.small{padding:6px 11px;font-size:12.5px;border-radius:8px}
+
+/* mobile */
+body[data-view="desktop"] .mobile-wrap{display:none}
+body[data-view="mobile"] .desktop-wrap{display:none}
+body[data-view="mobile"]{background:#e9ecf2}
+html[data-theme="dark"] body[data-view="mobile"]{background:#05070c}
+.mobile-wrap{max-width:420px;margin:24px auto;padding:0 8px 80px}
+.mobile-frame{background:var(--surface);border:1px solid var(--border);border-radius:28px;overflow:hidden;box-shadow:var(--shadow-md)}
+.m-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.m-topbar h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.m-eyebrow{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:2px;text-align:center}
+html[dir="rtl"] .m-eyebrow{letter-spacing:0}
+.m-body{padding:12px}
+.m-search{position:relative;margin-bottom:10px}
+.m-search input{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px 10px 36px;font:inherit;font-size:13.5px}
+.m-search input:focus{outline:none;border-color:var(--primary)}
+.m-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-dim)}
+html[dir="rtl"] .m-search input{padding:10px 36px 10px 12px}
+html[dir="rtl"] .m-search svg{left:auto;right:11px}
+.m-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.m-chips::-webkit-scrollbar{display:none}
+.m-inv-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
+.m-inv-card:hover{border-color:var(--border-strong)}
+.m-inv-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.m-inv-card .ref{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;color:var(--primary)}
+.m-inv-card .date{font-size:11.5px;color:var(--text-dim)}
+.m-inv-card .mid{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.m-inv-card .name{font-weight:700;font-size:14px}
+.m-inv-card .bottom{display:flex;justify-content:space-between;align-items:center}
+.m-inv-card .total{font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
+.m-inv-card .bar-wrap{flex:1;margin:0 12px}
+.m-inv-card .bar{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.m-inv-card .bar-fill{height:100%;border-radius:3px;background:var(--success)}
+
+/* sheet */
+.sheet-scrim{position:fixed;inset:0;background:rgba(10,13,20,.5);opacity:0;pointer-events:none;transition:opacity .22s;z-index:100}
+.sheet-scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:100%;max-width:440px;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.2);z-index:101;transition:transform .28s cubic-bezier(.2,.9,.3,1);max-height:86vh;display:flex;flex-direction:column}
+.sheet.open{transform:translate(-50%,0)}
+.sheet-handle{height:5px;width:42px;background:var(--border-strong);border-radius:999px;margin:10px auto 4px}
+.sheet-head{padding:8px 20px 14px;border-bottom:1px solid var(--border)}
+.sheet-head h3{margin:0;font-size:17px;font-weight:700}
+.sheet-body{padding:16px 20px;overflow:auto;flex:1}
+.sheet-footer{padding:10px 16px 16px;display:grid;grid-template-columns:1fr 2fr;gap:8px;border-top:1px solid var(--border)}
+.f-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px}
+html[dir="rtl"] .f-label{letter-spacing:0;text-align:right}
+.f-group{margin-bottom:16px}
+.select{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 36px 10px 12px;font:inherit;font-size:13.5px;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px;background-size:5px 5px;background-repeat:no-repeat;min-height:38px}
+.select:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+.input{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font:inherit;font-size:13.5px;min-height:38px}
+.input:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+
+/* RTL */
+html[dir="rtl"] .stats-strip,.inv-table,.filters{direction:rtl}
+html[dir="rtl"] .inv-thead .th,.inv-row .td{text-align:right}
+html[dir="rtl"] .inv-cust{flex-direction:row-reverse}
+html[dir="rtl"] .page-head{direction:rtl}
+html[dir="rtl"] .pagination{flex-direction:row-reverse}
+html[dir="rtl"] .pag-btns{flex-direction:row-reverse}
+html[dir="rtl"] .sheet{font-family:'Cairo',system-ui,sans-serif;direction:rtl}
+html[dir="rtl"] .sheet-footer{direction:rtl}
+html[dir="rtl"] .select{padding:10px 12px 10px 36px;background-position:calc(0% + 17px) 17px,calc(0% + 12px) 17px}
+html[dir="rtl"] .m-inv-card{direction:rtl}
+html[dir="rtl"] .m-inv-card .top,.m-inv-card .mid,.m-inv-card .bottom{flex-direction:row-reverse}
+html[dir="rtl"] .m-topbar{direction:rtl}
+html[dir="rtl"] .filters{flex-direction:row-reverse}
+@media(max-width:900px){.stats-strip{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body data-view="desktop">
+
+<div class="topbar">
+  <a class="brand" href="Create Sale Invoice.html"><div class="brand-mark">L</div><span>Ledgerly</span></a>
+  <div class="crumbs">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+    <span data-i18n="nav-invoices">Invoices</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="view-toggle">
+    <button id="view-desktop" class="active" data-view="desktop"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Desktop</button>
+    <button id="view-mobile" data-view="mobile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>Mobile</button>
+  </div>
+  <button class="lang-toggle" id="lang-toggle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 010 18M3 12h18"/></svg><span id="lang-label">عربي</span></button>
+  <button class="theme-toggle" id="theme-toggle"><svg id="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><span id="theme-label">Light</span></button>
+</div>
+
+<!-- DESKTOP -->
+<div class="desktop-wrap">
+<main class="page">
+  <div class="page-head">
+    <div>
+      <h1 data-i18n="page-title">Sale Invoices</h1>
+      <div class="sub" data-i18n="page-sub">All transactions across stores and sale types.</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="openSheet('sheet-filter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span data-i18n="btn-filter">Filters</span></button>
+      <a href="Create Sale Invoice.html" class="btn primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-invoice">New Invoice</span></a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-cell"><div class="lbl" data-i18n="stat-total">Total Invoices</div><div class="val">248</div><div class="trend" data-i18n="stat-total-sub">This month</div></div>
+    <div class="stat-cell success"><div class="lbl" data-i18n="stat-revenue">Total Revenue</div><div class="val">$84,320</div><div class="trend" data-i18n="stat-revenue-sub">+12% vs last month</div></div>
+    <div class="stat-cell primary"><div class="lbl" data-i18n="stat-outstanding">Outstanding</div><div class="val">$12,440</div><div class="trend" data-i18n="stat-outstanding-sub">34 invoices</div></div>
+    <div class="stat-cell danger"><div class="lbl" data-i18n="stat-overdue">Overdue</div><div class="val">$3,180</div><div class="trend" data-i18n="stat-overdue-sub">8 invoices past due</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input placeholder="Search by reference, customer, amount…" id="search-input" oninput="filterRows()"/>
+    </div>
+    <button class="filter-chip all" onclick="setFilter('all')" id="chip-all" data-i18n="chip-all">All</button>
+    <button class="filter-chip paid" onclick="setFilter('paid')" id="chip-paid" data-i18n="chip-paid">Paid</button>
+    <button class="filter-chip partial" onclick="setFilter('partial')" id="chip-partial" data-i18n="chip-partial">Partial</button>
+    <button class="filter-chip overdue" onclick="setFilter('overdue')" id="chip-overdue" data-i18n="chip-overdue">Overdue</button>
+    <button class="filter-chip draft" onclick="setFilter('draft')" id="chip-draft" data-i18n="chip-draft">Draft</button>
+    <button class="filter-chip voided" onclick="setFilter('voided')" id="chip-voided" data-i18n="chip-voided">Voided</button>
+    <button class="filter-btn" onclick="openSheet('sheet-filter')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span data-i18n="btn-more-filters">More Filters</span></button>
+  </div>
+
+  <!-- Table -->
+  <div class="inv-table">
+    <div class="inv-thead">
+      <div class="th sorted" data-i18n="th-ref">Reference <span class="sort">↓</span></div>
+      <div class="th" data-i18n="th-customer">Customer</div>
+      <div class="th" data-i18n="th-date">Date</div>
+      <div class="th" data-i18n="th-type">Type</div>
+      <div class="th" data-i18n="th-total">Total</div>
+      <div class="th" data-i18n="th-paid">Paid</div>
+      <div class="th" data-i18n="th-balance">Balance</div>
+      <div class="th" data-i18n="th-status">Status</div>
+      <div class="th"></div>
+    </div>
+    <div id="invoice-rows"></div>
+    <div class="pagination">
+      <span id="pag-info">Showing 1–10 of 248</span>
+      <div class="pag-btns">
+        <button class="pag-btn">‹</button>
+        <button class="pag-btn active">1</button>
+        <button class="pag-btn">2</button>
+        <button class="pag-btn">3</button>
+        <span style="padding:0 4px;color:var(--text-dim)">…</span>
+        <button class="pag-btn">25</button>
+        <button class="pag-btn">›</button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- MOBILE -->
+<div class="mobile-wrap">
+  <div class="mobile-frame">
+    <div class="m-topbar">
+      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div style="text-align:center"><div class="m-eyebrow" data-i18n="nav-invoices">Invoices</div><h1 data-i18n="page-title">Sale Invoices</h1></div>
+      <a href="Create Sale Invoice.html" style="appearance:none;border:0;background:var(--primary);color:#fff;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;cursor:pointer;text-decoration:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></a>
+    </div>
+    <div class="m-body">
+      <!-- mini stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--success-soft);border:1px solid color-mix(in oklab,var(--success) 25%,var(--border));border-radius:12px;padding:12px"><div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--success-ink);font-weight:600;opacity:.8;margin-bottom:4px" data-i18n="stat-revenue">Revenue</div><div style="font-size:20px;font-weight:700;color:var(--success-ink);font-variant-numeric:tabular-nums">$84,320</div></div>
+        <div style="background:var(--danger-soft);border:1px solid color-mix(in oklab,var(--danger) 25%,var(--border));border-radius:12px;padding:12px"><div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--danger-ink);font-weight:600;opacity:.8;margin-bottom:4px" data-i18n="stat-overdue">Overdue</div><div style="font-size:20px;font-weight:700;color:var(--danger-ink);font-variant-numeric:tabular-nums">$3,180</div></div>
+      </div>
+      <!-- search -->
+      <div class="m-search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="Search invoices…"/></div>
+      <!-- chips -->
+      <div class="m-chips">
+        <button class="filter-chip all" data-i18n="chip-all">All</button>
+        <button class="filter-chip paid" data-i18n="chip-paid">Paid</button>
+        <button class="filter-chip partial" data-i18n="chip-partial">Partial</button>
+        <button class="filter-chip overdue" data-i18n="chip-overdue">Overdue</button>
+        <button class="filter-chip draft" data-i18n="chip-draft">Draft</button>
+      </div>
+      <!-- cards -->
+      <div id="m-invoice-cards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Sheet -->
+<div class="sheet-scrim" id="scrim" onclick="closeSheets()"></div>
+<div class="sheet" id="sheet-filter">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><h3 data-i18n="sheet-filter-title">Filter Invoices</h3><button style="appearance:none;border:0;background:transparent;color:var(--text-dim);cursor:pointer;position:absolute;right:16px;top:18px" onclick="closeSheets()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M6 18L18 6"/></svg></button></div>
+  <div class="sheet-body">
+    <div class="f-group"><div class="f-label" data-i18n="filter-date-range">Date Range</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input class="input" type="date" value="2023-10-01"/><input class="input" type="date" value="2023-12-31"/></div>
+    </div>
+    <div class="f-group"><div class="f-label" data-i18n="filter-store">Store</div><select class="select"><option data-i18n="opt-all-stores">All Stores</option><option>Main Flagship Store</option><option>Main Downtown Hub</option><option>Airport Kiosk</option></select></div>
+    <div class="f-group"><div class="f-label" data-i18n="filter-sale-type">Sale Type</div><select class="select"><option data-i18n="opt-all-types">All Types</option><option data-i18n="st-cash">Cash</option><option data-i18n="st-installment">Installment</option><option data-i18n="st-credit">Credit</option></select></div>
+    <div class="f-group"><div class="f-label" data-i18n="filter-amount">Amount Range</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input class="input" placeholder="Min $"/><input class="input" placeholder="Max $"/></div>
+    </div>
+    <div class="f-group"><div class="f-label" data-i18n="filter-sort">Sort By</div><select class="select"><option data-i18n="sort-date-desc">Date (Newest first)</option><option data-i18n="sort-date-asc">Date (Oldest first)</option><option data-i18n="sort-amount-desc">Amount (High to Low)</option><option data-i18n="sort-balance-desc">Balance (High to Low)</option></select></div>
+  </div>
+  <div class="sheet-footer"><button class="btn" onclick="closeSheets()" data-i18n="btn-reset">Reset</button><button class="btn primary" style="justify-content:center" onclick="closeSheets()" data-i18n="btn-apply-filters">Apply Filters</button></div>
+</div>
+
+<script>
+const INVOICES = [
+  {ref:'INV-2023-014',cust:'Daniel Park',custId:'F-177',color:'#2d5bff',date:'Apr 25, 2026',type:'cash',total:57.49,paid:57.49,status:'paid'},
+  {ref:'INV-2023-007',cust:'Alex Thompson',custId:'F-062',color:'#7c3aed',date:'Nov 01, 2023',type:'installment',total:92.49,paid:50.83,status:'partial'},
+  {ref:'INV-2023-019',cust:'Sara Mendes',custId:'F-018',color:'#16a34a',date:'Nov 15, 2023',type:'credit',total:215.00,paid:0,status:'overdue'},
+  {ref:'INV-2023-025',cust:'Northfield Catering',custId:'W-204',color:'#c68b00',date:'Nov 22, 2023',type:'installment',total:845.50,paid:281.83,status:'partial'},
+  {ref:'INV-2023-031',cust:'Daniel Park',custId:'F-177',color:'#2d5bff',date:'Dec 01, 2023',type:'cash',total:34.75,paid:34.75,status:'paid'},
+  {ref:'INV-2023-038',cust:'Alex Thompson',custId:'F-062',color:'#7c3aed',date:'Dec 10, 2023',type:'advance',total:120.00,paid:120.00,status:'paid'},
+  {ref:'INV-2023-042',cust:'Sara Mendes',custId:'F-018',color:'#16a34a',date:'Dec 18, 2023',type:'cash',total:89.20,paid:89.20,status:'paid'},
+  {ref:'INV-2023-049',cust:'Northfield Catering',custId:'W-204',color:'#c68b00',date:'Jan 05, 2024',type:'installment',total:1240.00,paid:0,status:'draft'},
+  {ref:'INV-2023-055',cust:'Daniel Park',custId:'F-177',color:'#2d5bff',date:'Jan 12, 2024',type:'cash',total:45.99,paid:45.99,status:'paid'},
+  {ref:'INV-2023-061',cust:'Alex Thompson',custId:'F-062',color:'#7c3aed',date:'Jan 20, 2024',type:'credit',total:310.00,paid:0,status:'voided'},
+];
+
+const TYPE_LABELS = {cash:'Cash',installment:'Installment',credit:'Credit',advance:'Advance'};
+const TYPE_LABELS_AR = {cash:'نقدي',installment:'تقسيط',credit:'آجل',advance:'مقدّم'};
+const STATUS_LABELS = {paid:'Paid',partial:'Partial',overdue:'Overdue',draft:'Draft',voided:'Voided'};
+const STATUS_LABELS_AR = {paid:'مدفوع',partial:'جزئي',overdue:'متأخر',draft:'مسودة',voided:'ملغي'};
+
+let activeFilter='all', searchQuery='';
+
+function fmt(n){return '$'+Math.abs(n).toFixed(2)}
+function pct(paid,total){return total>0?Math.round(paid/total*100):0}
+function invoiceDetailsUrl(inv){return inv.type==='cash'?'Sale Invoice Details - Cash.html':'Sale Invoice Details.html'}
+
+function renderRows(){
+  const lang = document.documentElement.lang;
+  const list = document.getElementById('invoice-rows');
+  list.innerHTML='';
+  const filtered = INVOICES.filter(inv=>{
+    if(activeFilter!=='all' && inv.status!==activeFilter) return false;
+    if(searchQuery && !inv.ref.toLowerCase().includes(searchQuery) && !inv.cust.toLowerCase().includes(searchQuery)) return false;
+    return true;
+  });
+  filtered.forEach(inv=>{
+    const p = pct(inv.paid,inv.total);
+    const balance = Math.max(0,inv.total-inv.paid);
+    const tl = lang==='ar' ? TYPE_LABELS_AR[inv.type] : TYPE_LABELS[inv.type];
+    const sl = lang==='ar' ? STATUS_LABELS_AR[inv.status] : STATUS_LABELS[inv.status];
+    const row = document.createElement('div');
+    row.className='inv-row';
+    row.onclick = ()=>{ window.location.href=invoiceDetailsUrl(inv); };
+    row.innerHTML=`
+      <div class="td"><span class="inv-ref">${inv.ref}</span></div>
+      <div class="td"><div class="inv-cust">
+        <div class="cust-av" style="background:${inv.color}">${inv.cust[0]}</div>
+        <div><div class="cust-nm">${inv.cust}</div><div class="cust-id mono">#${inv.custId}</div></div>
+      </div></div>
+      <div class="td" style="color:var(--text-muted);font-size:12.5px">${inv.date}</div>
+      <div class="td"><span class="inv-type ${inv.type}">${tl}</span></div>
+      <div class="td"><span class="amt">${fmt(inv.total)}</span></div>
+      <div class="td"><span class="amt pos">${fmt(inv.paid)}</span><div class="mini-bar"><div class="mini-bar-fill" style="width:${p}%"></div></div></div>
+      <div class="td"><span class="amt ${balance>0?'neg':'muted'}">${balance>0?fmt(balance):'—'}</span></div>
+      <div class="td"><span class="status-badge ${inv.status}"><span class="dot"></span>${sl}</span></div>
+      <div class="td"><div class="row-actions">
+        <button class="icon-btn" title="View" onclick="event.stopPropagation();window.location.href=invoiceDetailsUrl(inv)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button class="icon-btn" title="More" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div></div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('pag-info').textContent = `Showing 1–${filtered.length} of 248`;
+
+  // mobile cards
+  const mc = document.getElementById('m-invoice-cards');
+  mc.innerHTML='';
+  filtered.forEach(inv=>{
+    const p = pct(inv.paid,inv.total);
+    const balance = Math.max(0,inv.total-inv.paid);
+    const sl = lang==='ar' ? STATUS_LABELS_AR[inv.status] : STATUS_LABELS[inv.status];
+    const card = document.createElement('div');
+    card.className='m-inv-card';
+    card.onclick = ()=>{ window.location.href=invoiceDetailsUrl(inv); };
+    card.innerHTML=`
+      <div class="top"><span class="inv-ref">${inv.ref}</span><span style="font-size:11.5px;color:var(--text-dim)">${inv.date}</span></div>
+      <div class="mid"><div class="cust-av" style="background:${inv.color};width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700">${inv.cust[0]}</div><div class="name">${inv.cust}</div><span class="status-badge ${inv.status}" style="margin-left:auto"><span class="dot"></span>${sl}</span></div>
+      <div class="bottom">
+        <div class="total">${fmt(inv.total)}</div>
+        <div class="bar-wrap"><div class="bar"><div class="bar-fill" style="width:${p}%"></div></div><div style="font-size:10.5px;color:var(--text-dim);margin-top:3px">${p}% paid</div></div>
+        <div style="text-align:right;font-size:12px;color:${balance>0?'var(--danger)':'var(--text-dim)'}"><span>${balance>0?'−'+fmt(balance):'Settled'}</span></div>
+      </div>`;
+    mc.appendChild(card);
+  });
+}
+
+function setFilter(f){
+  activeFilter=f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.style.opacity='0.5');
+  document.getElementById('chip-'+f).style.opacity='1';
+  renderRows();
+}
+function filterRows(){
+  searchQuery=document.getElementById('search-input').value.toLowerCase();
+  renderRows();
+}
+function openSheet(id){document.getElementById('scrim').classList.add('open');document.getElementById(id).classList.add('open')}
+function closeSheets(){document.getElementById('scrim').classList.remove('open');document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'))}
+
+// theme
+const root=document.documentElement;
+const t0=localStorage.getItem('invoice-theme')||'light';
+root.setAttribute('data-theme',t0);
+updateTheme();
+document.getElementById('theme-toggle').addEventListener('click',()=>{
+  const t=root.getAttribute('data-theme')==='dark'?'light':'dark';
+  root.setAttribute('data-theme',t);localStorage.setItem('invoice-theme',t);updateTheme();
+});
+function updateTheme(){
+  const t=root.getAttribute('data-theme');
+  document.getElementById('theme-label').textContent=t==='dark'?(currentLang==='ar'?'داكن':'Dark'):(currentLang==='ar'?'فاتح':'Light');
+  document.getElementById('theme-icon').innerHTML=t==='dark'
+    ?'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'
+    :'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
+}
+// view
+const body=document.body;
+const sv=localStorage.getItem('invoice-view')||'desktop';
+body.setAttribute('data-view',sv);
+document.querySelectorAll('.view-toggle button').forEach(b=>{
+  b.classList.toggle('active',b.dataset.view===sv);
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.view-toggle button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');body.setAttribute('data-view',b.dataset.view);
+    localStorage.setItem('invoice-view',b.dataset.view);
+  });
+});
+
+// i18n
+const T={
+  en:{
+    'nav-invoices':'Invoices','page-title':'Sale Invoices','page-sub':'All transactions across stores and sale types.',
+    'btn-filter':'Filters','btn-new-invoice':'New Invoice',
+    'stat-total':'Total Invoices','stat-total-sub':'This month',
+    'stat-revenue':'Total Revenue','stat-revenue-sub':'+12% vs last month',
+    'stat-outstanding':'Outstanding','stat-outstanding-sub':'34 invoices',
+    'stat-overdue':'Overdue','stat-overdue-sub':'8 invoices past due',
+    'chip-all':'All','chip-paid':'Paid','chip-partial':'Partial','chip-overdue':'Overdue','chip-draft':'Draft','chip-voided':'Voided',
+    'btn-more-filters':'More Filters','th-ref':'Reference','th-customer':'Customer','th-date':'Date',
+    'th-type':'Type','th-total':'Total','th-paid':'Paid','th-balance':'Balance','th-status':'Status',
+    'sheet-filter-title':'Filter Invoices','filter-date-range':'Date Range','filter-store':'Store',
+    'filter-sale-type':'Sale Type','filter-amount':'Amount Range','filter-sort':'Sort By',
+    'opt-all-stores':'All Stores','opt-all-types':'All Types',
+    'st-cash':'Cash','st-installment':'Installment','st-credit':'Credit',
+    'sort-date-desc':'Date (Newest first)','sort-date-asc':'Date (Oldest first)',
+    'sort-amount-desc':'Amount (High to Low)','sort-balance-desc':'Balance (High to Low)',
+    'btn-reset':'Reset','btn-apply-filters':'Apply Filters',
+    'view-desktop':'Desktop','view-mobile':'Mobile','theme-light':'Light','theme-dark':'Dark',
+  },
+  ar:{
+    'nav-invoices':'الفواتير','page-title':'فواتير المبيعات','page-sub':'جميع المعاملات عبر المتاجر وأنواع البيع.',
+    'btn-filter':'تصفية','btn-new-invoice':'فاتورة جديدة',
+    'stat-total':'إجمالي الفواتير','stat-total-sub':'هذا الشهر',
+    'stat-revenue':'إجمالي الإيرادات','stat-revenue-sub':'+12% مقارنة بالشهر الماضي',
+    'stat-outstanding':'المستحقات','stat-outstanding-sub':'34 فاتورة',
+    'stat-overdue':'المتأخرات','stat-overdue-sub':'8 فواتير متأخرة',
+    'chip-all':'الكل','chip-paid':'مدفوعة','chip-partial':'جزئية','chip-overdue':'متأخرة','chip-draft':'مسودة','chip-voided':'ملغية',
+    'btn-more-filters':'فلاتر أكثر','th-ref':'المرجع','th-customer':'العميل','th-date':'التاريخ',
+    'th-type':'النوع','th-total':'الإجمالي','th-paid':'المدفوع','th-balance':'الرصيد','th-status':'الحالة',
+    'sheet-filter-title':'تصفية الفواتير','filter-date-range':'النطاق الزمني','filter-store':'المتجر',
+    'filter-sale-type':'نوع البيع','filter-amount':'نطاق المبلغ','filter-sort':'ترتيب حسب',
+    'opt-all-stores':'جميع المتاجر','opt-all-types':'جميع الأنواع',
+    'st-cash':'نقدي','st-installment':'تقسيط','st-credit':'آجل',
+    'sort-date-desc':'التاريخ (الأحدث أولاً)','sort-date-asc':'التاريخ (الأقدم أولاً)',
+    'sort-amount-desc':'المبلغ (من الأعلى)','sort-balance-desc':'الرصيد (من الأعلى)',
+    'btn-reset':'إعادة ضبط','btn-apply-filters':'تطبيق الفلاتر',
+    'view-desktop':'سطح المكتب','view-mobile':'الجوال','theme-light':'فاتح','theme-dark':'داكن',
+  }
+};
+let currentLang=localStorage.getItem('invoice-lang')||'en';
+function applyLang(lang){
+  currentLang=lang;
+  root.lang=lang;root.dir=lang==='ar'?'rtl':'ltr';
+  localStorage.setItem('invoice-lang',lang);
+  document.getElementById('lang-label').textContent=lang==='ar'?'EN':'عربي';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n;if(T[lang][k]!==undefined)el.textContent=T[lang][k];
+  });
+  document.querySelectorAll('.view-toggle button').forEach(b=>{
+    if(b.dataset.view==='desktop') b.childNodes[b.childNodes.length-1].textContent=' '+T[lang]['view-desktop'];
+    if(b.dataset.view==='mobile')  b.childNodes[b.childNodes.length-1].textContent=' '+T[lang]['view-mobile'];
+  });
+  updateTheme();renderRows();
+}
+document.getElementById('lang-toggle').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
+applyLang(currentLang);
+renderRows();
+</script>
+<script src="arabic-page-helper.js"></script>
+</body>
+</html>

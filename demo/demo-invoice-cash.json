@@ -1,0 +1,56 @@
+{
+  "ref": "INV-2023-014",
+  "type": "cash",
+  "status": "paid",
+  "store": "Main Flagship Store",
+  "register": "Register #3",
+  "servedBy": "Ahmed Khalil",
+  "date": "Apr 25, 2026",
+  "time": "09:42 AM",
+  "currency": "USD — US Dollar",
+  "taxScheme": "Tax Exclusive · 5%",
+  "cashAccountCode": "1001-01",
+  "cashAccountName": "Petty Cash",
+  "receiptNo": "RC-00441",
+  "txnRef": "CASH-25042026",
+  "customer": {
+    "id": "F-177",
+    "name": "Daniel Park",
+    "initial": "D",
+    "email": "daniel@email.com",
+    "phone": "+1 555 088 4412",
+    "label": "Walk-in retail"
+  },
+  "totals": {
+    "tendered": 60.00,
+    "change": 2.51,
+    "balance": 0.00,
+    "subtotal": 40.25,
+    "lineDiscount": -1.00,
+    "loyaltyDiscount": -2.01,
+    "taxableNet": 37.24,
+    "tax": 1.86,
+    "invoiceTotal": 39.10,
+    "displayedTotal": 57.49
+  },
+  "products": [
+    { "icon": "🍔", "name": "Classic Beef Burger",   "sku": "BRG-001", "qty": 2, "price": 12.50, "discount": null,    "total": 25.00 },
+    { "icon": "🍗", "name": "Crispy Chicken Wings",  "sku": "CHK-007", "qty": 1, "price": 9.75,  "discount": -1.00,   "total": 8.75  },
+    { "icon": "🥤", "name": "Sparkling Lemonade",    "sku": "DRK-101", "qty": 2, "price": 3.25,  "discount": null,    "total": 6.50  }
+  ],
+  "additionalCosts": [
+    { "type": "discount", "label": "Member Loyalty Discount (5%)", "amount": -2.01 }
+  ],
+  "journalEntries": [
+    { "account": "Cash / Petty Cash",  "code": "1001-01", "desc": "Cash received — Daniel Park",       "dr": 57.49, "cr": null,   "highlight": true },
+    { "account": "Sales Revenue",      "code": "4000-01", "desc": "Net revenue (products − discounts)","dr": null,  "cr": 38.24                     },
+    { "account": "Sales Discounts",    "code": "4900-01", "desc": "Line disc. $1.00 + Loyalty $2.01",  "dr": 3.01,  "cr": null                      },
+    { "account": "VAT / Tax Payable",  "code": "2200-01", "desc": "5% tax on net $38.24",              "dr": null,  "cr": 1.91                      }
+  ],
+  "activity": [
+    { "type": "created", "title": "Invoice created (cash sale)",                                                       "ts": "Apr 25, 2026 · 09:42:08 AM by Ahmed Khalil · Register #3" },
+    { "type": "paid",    "title": "Payment of $57.49 received in cash — tendered $60.00, change $2.51",                "ts": "Apr 25, 2026 · 09:42:11 AM · Auto-settled at POS" },
+    { "type": "print",   "title": "Receipt #RC-00441 printed",                                                         "ts": "Apr 25, 2026 · 09:42:14 AM" },
+    { "type": "created", "title": "Journal entries posted automatically",                                              "ts": "Apr 25, 2026 · 09:42:11 AM · System" }
+  ]
+}

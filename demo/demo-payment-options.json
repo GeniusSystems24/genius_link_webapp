@@ -1,0 +1,24 @@
+{
+  "outstandingInvoices": [
+    {
+      "ref": "INV-2023-007",
+      "cust": "Alex Thompson",
+      "sub": "Installment · 3 payments · $92.49 total",
+      "balance": 41.66,
+      "status": "partial",
+      "note": "Installments #2 & #3 pending"
+    },
+    {
+      "ref": "INV-2023-019",
+      "cust": "Sara Mendes",
+      "sub": "Credit · $215.00 total",
+      "balance": 215.00,
+      "status": "overdue",
+      "note": "Overdue since Dec 01"
+    }
+  ],
+  "allocations": [
+    { "label": "Installment #2", "sub": "Due Jan 01, 2024", "amount": 20.83, "overdue": false, "checked": true  },
+    { "label": "Installment #3", "sub": "Due Feb 01, 2024", "amount": 20.83, "overdue": false, "checked": false }
+  ]
+}

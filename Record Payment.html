@@ -6,226 +6,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#f5f6f8;--surface:#fff;--surface-2:#f0f2f6;--surface-3:#e7eaf0;
-  --border:#e3e6ec;--border-strong:#d3d8e1;
-  --text:#0f1525;--text-muted:#5d6478;--text-dim:#8a90a1;
-  --primary:#2d5bff;--primary-soft:#e5ecff;--primary-ink:#1d3fbf;
-  --success:#16a34a;--success-soft:#dff7e5;--success-ink:#0c6b33;
-  --danger:#dc2626;--danger-soft:#fde2e2;--danger-ink:#971818;
-  --amber:#c68b00;--amber-soft:#fdedc8;--amber-ink:#7f5700;
-  --shadow-sm:0 1px 2px rgba(15,21,37,.04);
-  --shadow-md:0 4px 16px -4px rgba(15,21,37,.10);
-  --shadow-lg:0 20px 60px -20px rgba(15,21,37,.22);
-  --ring:0 0 0 3px rgba(45,91,255,.18);
-  --radius:12px;--radius-sm:8px;--radius-lg:16px;
-}
-html[data-theme="dark"]{
-  --bg:#0a0d14;--surface:#111523;--surface-2:#151a2b;--surface-3:#1c2238;
-  --border:#212741;--border-strong:#2c345a;
-  --text:#e8eaf2;--text-muted:#9aa0b8;--text-dim:#6b7291;
-  --primary:#5b7bff;--primary-soft:#1b2550;--primary-ink:#a8b7ff;
-  --success:#22c55e;--success-soft:#102a1c;--success-ink:#4ade80;
-  --danger:#ef4444;--danger-soft:#2a1416;--danger-ink:#fca5a5;
-  --amber:#eab308;--amber-soft:#2a2112;--amber-ink:#fde68a;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.3);--shadow-md:0 4px 24px -4px rgba(0,0,0,.5);
-  --shadow-lg:0 20px 80px -20px rgba(0,0,0,.8);
-  --ring:0 0 0 3px rgba(91,123,255,.25);
-}
-*{box-sizing:border-box}html,body{margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.4}
-html[dir="rtl"] body{font-family:'Cairo',system-ui,sans-serif}
-.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
-
-/* topbar */
-.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;color:var(--text)}
-.brand-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--primary),#7890ff);display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
-.crumbs{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
-.crumbs a{color:var(--text-muted);text-decoration:none;font-weight:500}.crumbs a:hover{color:var(--text)}
-.topbar-spacer{flex:1}
-.theme-toggle,.lang-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);cursor:pointer;color:var(--text-muted);font-size:12px;font-weight:700;font:inherit}
-.theme-toggle:hover,.lang-toggle:hover{color:var(--text);border-color:var(--border-strong)}
-.view-toggle{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px}
-.view-toggle button{appearance:none;border:0;background:transparent;color:var(--text-muted);font:inherit;padding:5px 12px;border-radius:999px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.view-toggle button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
-
-/* page */
-.page{padding:32px 24px;max-width:860px;margin:0 auto;width:100%}
-
-/* stepper */
-.stepper{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:36px}
-.step-item{display:flex;align-items:center;gap:0}
-.step-circle{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;border:2px solid var(--border);color:var(--text-dim);background:var(--surface);transition:all .25s;flex:none}
-.step-circle.active{border-color:var(--primary);background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(45,91,255,.35)}
-.step-circle.done{border-color:var(--success);background:var(--success);color:#fff}
-.step-label{font-size:11.5px;font-weight:600;color:var(--text-dim);margin-top:6px;white-space:nowrap}
-html[dir="rtl"] .step-label{letter-spacing:0}
-.step-label.active{color:var(--primary)}
-.step-label.done{color:var(--success)}
-.step-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
-.step-line{width:80px;height:2px;background:var(--border);margin-bottom:24px;flex:none}
-.step-line.done{background:var(--success)}
-@media(max-width:600px){.step-line{width:40px}}
-
-/* card */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:16px}
-.card-head{padding:20px 24px 0;border-bottom:0}
-.card-title{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
-.card-sub{color:var(--text-muted);font-size:13px}
-.card-body{padding:20px 24px 24px}
-
-/* form */
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.field:last-child{margin-bottom:0}
-.field label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
-html[dir="rtl"] .field label{letter-spacing:0;text-align:right}
-.input{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:11px 13px;font:inherit;font-size:14px;transition:border-color .15s,box-shadow .15s;min-height:44px}
-.input:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring);background:var(--surface)}
-.input::placeholder{color:var(--text-dim)}
-.select{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:11px 36px 11px 13px;font:inherit;font-size:14px;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat;min-height:44px}
-.select:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
-html[dir="rtl"] .select{padding:11px 13px 11px 36px;background-position:calc(0% + 17px) 50%,calc(0% + 12px) 50%}
-.big-amt-wrap{position:relative}
-.big-amt-wrap .cur{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-weight:700;font-size:18px;color:var(--text-muted);pointer-events:none}
-html[dir="rtl"] .big-amt-wrap .cur{left:auto;right:16px}
-.big-amt{padding-left:44px;font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;height:62px;border-radius:14px;background:var(--surface-2);border:2px solid var(--border)}
-.big-amt:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring);background:var(--surface)}
-html[dir="rtl"] .big-amt{padding-left:13px;padding-right:44px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-html[dir="rtl"] .grid2{direction:rtl}
-
-/* seg */
-.seg{display:grid;gap:6px;background:var(--surface-2);padding:5px;border-radius:12px;border:1px solid var(--border)}
-.seg.cols2{grid-template-columns:1fr 1fr}
-.seg.cols3{grid-template-columns:1fr 1fr 1fr}
-.seg button{appearance:none;border:0;background:transparent;padding:9px 12px;border-radius:8px;color:var(--text-muted);font:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .15s}
-.seg button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
-html[dir="rtl"] .seg{direction:rtl}
-
-/* invoice picker */
-.inv-option{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;margin-bottom:8px;background:var(--surface-2)}
-.inv-option:hover{border-color:var(--border-strong);background:var(--surface)}
-.inv-option.selected{border-color:var(--primary);background:var(--primary-soft)}
-.inv-option .check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);flex:none;display:grid;place-items:center;transition:all .15s}
-.inv-option.selected .check{background:var(--primary);border-color:var(--primary);color:#fff}
-.inv-option .info{flex:1;min-width:0}
-.inv-option .ref{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;color:var(--primary)}
-.inv-option .cust{font-weight:600;font-size:14px;margin-top:2px}
-.inv-option .sub{color:var(--text-muted);font-size:12px;margin-top:2px}
-.inv-option .badge{padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;background:var(--amber-soft);color:var(--amber-ink)}
-.inv-option .balance{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;color:var(--danger);text-align:right}
-html[dir="rtl"] .inv-option{flex-direction:row-reverse}
-html[dir="rtl"] .inv-option .balance{text-align:left}
-
-/* installment allocation */
-.alloc-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-.alloc-item:hover{border-color:var(--border-strong)}
-.alloc-item.selected{border-color:var(--primary);background:var(--primary-soft)}
-.alloc-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--primary);cursor:pointer;flex:none}
-.alloc-item .al{flex:1}
-.alloc-item .al .t{font-weight:600;font-size:13.5px}
-.alloc-item .al .s{color:var(--text-dim);font-size:12px;margin-top:2px}
-.alloc-item .amt{font-weight:700;font-variant-numeric:tabular-nums}
-.alloc-item.overdue{border-color:color-mix(in oklab,var(--danger) 40%,var(--border));background:var(--danger-soft)}
-html[dir="rtl"] .alloc-item{flex-direction:row-reverse}
-
-/* receipt card */
-.receipt{background:linear-gradient(135deg,var(--success) 0%,color-mix(in oklab,var(--success) 70%,#0ea5e9) 100%);border-radius:20px;padding:28px;color:#fff;margin-bottom:20px}
-.receipt .r-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;margin-bottom:16px}
-.receipt .r-amount{font-size:48px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-bottom:4px}
-.receipt .r-sub{opacity:.85;font-size:13.5px}
-.receipt .r-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-.receipt .r-cell{background:rgba(255,255,255,.15);border-radius:12px;padding:12px 14px}
-.receipt .r-cell .rl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;font-weight:600;margin-bottom:4px}
-html[dir="rtl"] .receipt .r-cell .rl{letter-spacing:0}
-.receipt .r-cell .rv{font-size:15px;font-weight:700}
-
-/* summary box */
-.summary-box{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
-.s-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13px}
-.s-row:last-child{border-bottom:0;font-weight:700;font-size:14px;padding-top:10px;margin-top:2px}
-.s-row .k{color:var(--text-muted)}
-.s-row .v{font-weight:600;font-variant-numeric:tabular-nums}
-.s-row .v.danger{color:var(--danger)}
-.s-row .v.success{color:var(--success)}
-html[dir="rtl"] .s-row{flex-direction:row-reverse}
-
-/* step nav */
-.step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
-html[dir="rtl"] .step-nav{flex-direction:row-reverse}
-
-/* btn */
-.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:600;font-size:14px;padding:11px 20px;border-radius:10px;display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);transition:background .15s,transform .05s}
-.btn:hover{background:var(--surface-3)}
-.btn:active{transform:translateY(1px)}
-.btn.primary{background:var(--primary);color:#fff;border-color:transparent;box-shadow:0 8px 20px -8px rgba(45,91,255,.45)}
-.btn.primary:hover{background:#2148e5}
-.btn.success{background:var(--success);color:#fff;border-color:transparent;box-shadow:0 8px 20px -8px rgba(22,163,74,.45)}
-.btn.ghost{background:transparent}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-
-/* pill */
-.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600}
-.pill.amber{background:var(--amber-soft);color:var(--amber-ink)}
-.pill.success{background:var(--success-soft);color:var(--success-ink)}
-.pill.danger{background:var(--danger-soft);color:var(--danger-ink)}
-
-/* success animation */
-@keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
-.success-anim{animation:pop .4s ease forwards}
-.check-circle{width:72px;height:72px;border-radius:50%;background:var(--success);display:grid;place-items:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(22,163,74,.4)}
-
-/* mobile */
-body[data-view="desktop"] .mobile-wrap{display:none}
-body[data-view="mobile"] .desktop-wrap{display:none}
-body[data-view="mobile"]{background:#e9ecf2}
-html[data-theme="dark"] body[data-view="mobile"]{background:#05070c}
-.mobile-wrap{max-width:420px;margin:24px auto;padding:0 8px 80px}
-.mobile-frame{background:var(--surface);border:1px solid var(--border);border-radius:28px;overflow:hidden;box-shadow:var(--shadow-md);padding-bottom:80px;position:relative;min-height:600px}
-.m-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
-.m-topbar h1{margin:0;font-size:16px;font-weight:700}
-.m-eyebrow{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);font-weight:600;text-align:center;margin-bottom:2px}
-html[dir="rtl"] .m-eyebrow{letter-spacing:0}
-.m-body{padding:16px}
-.m-stepper{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:20px}
-.m-step{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);font-size:11px;font-weight:700;display:grid;place-items:center;flex:none}
-.m-step.active{border-color:var(--primary);background:var(--primary);color:#fff}
-.m-step.done{border-color:var(--success);background:var(--success);color:#fff}
-.m-line{width:32px;height:2px;background:var(--border)}
-.m-line.done{background:var(--success)}
-.mobile-footer{position:absolute;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 12px;display:grid;grid-template-columns:1fr 2fr;gap:8px}
-html[dir="rtl"] .mobile-footer{direction:rtl}
-html[dir="rtl"] .crumbs{flex-direction:row-reverse}
-html[dir="rtl"] .m-topbar{direction:rtl}
-html[dir="rtl"] .m-stepper{direction:ltr}
-
-/* step panels */
-.step-panel{display:none}.step-panel.active{display:block}
-</style>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/record-payment.css">
 </head>
 <body data-view="desktop">
 
-<div class="topbar">
-  <a class="brand" href="Invoice List.html"><div class="brand-mark">L</div><span>Ledgerly</span></a>
-  <div class="crumbs">
-    <a href="Invoice List.html" data-i18n="nav-invoices">Invoices</a>
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-    <a href="Sale Invoice Details.html" data-i18n="crumb-invoice">INV-2023-007</a>
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-    <span data-i18n="crumb-record">Record Payment</span>
-  </div>
-  <div class="topbar-spacer"></div>
-  <div class="view-toggle">
-    <button id="view-desktop" class="active" data-view="desktop"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Desktop</button>
-    <button id="view-mobile" data-view="mobile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>Mobile</button>
-  </div>
-  <button class="lang-toggle" id="lang-toggle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 010 18M3 12h18"/></svg><span id="lang-label">عربي</span></button>
-  <button class="theme-toggle" id="theme-toggle"><svg id="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><span id="theme-label">Light</span></button>
-</div>
+<!-- Topbar (rendered by components/topbar.js) -->
+<div data-component="topbar"
+     data-brand-href="Invoice List.html"
+     data-crumbs='[{"label":"Invoices","href":"Invoice List.html","key":"nav-invoices"},{"label":"INV-2023-007","href":"Sale Invoice Details.html","key":"crumb-invoice"},{"label":"Record Payment","key":"crumb-record"}]'></div>
 
-<!-- DESKTOP -->
+<!-- =================== DESKTOP =================== -->
 <div class="desktop-wrap">
 <main class="page">
 
@@ -259,7 +50,7 @@ html[dir="rtl"] .m-stepper{direction:ltr}
         </div>
         <div class="step-nav">
           <a href="Sale Invoice Details.html" class="btn ghost" data-i18n="btn-cancel">Cancel</a>
-          <button class="btn primary" onclick="goStep(2)">
+          <button class="btn primary" onclick="stepper.go(2)">
             <span data-i18n="btn-next">Next</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
@@ -321,8 +112,8 @@ html[dir="rtl"] .m-stepper{direction:ltr}
         </div>
 
         <div class="step-nav">
-          <button class="btn ghost" onclick="goStep(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
-          <button class="btn primary" onclick="goStep(3)"><span data-i18n="btn-review">Review</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          <button class="btn ghost" onclick="stepper.go(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
+          <button class="btn primary" onclick="stepper.go(3)"><span data-i18n="btn-review">Review</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
         </div>
       </div>
     </div>
@@ -377,8 +168,8 @@ html[dir="rtl"] .m-stepper{direction:ltr}
         </div>
 
         <div class="step-nav">
-          <button class="btn ghost" onclick="goStep(2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
-          <button class="btn primary" onclick="goStep(4)">
+          <button class="btn ghost" onclick="stepper.go(2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
+          <button class="btn primary" onclick="stepper.go(4)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
             <span data-i18n="btn-confirm-post">Confirm & Post</span>
           </button>
@@ -416,7 +207,7 @@ html[dir="rtl"] .m-stepper{direction:ltr}
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
             <button class="btn" onclick="window.print()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg><span data-i18n="btn-print">Print</span></button>
-            <a href="Sale Invoice Details.html" class="btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7-11-7-11-7z"/></svg><span data-i18n="btn-view-invoice">View Invoice</span></button>
+            <a href="Sale Invoice Details.html" class="btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7-11-7-11-7z"/></svg><span data-i18n="btn-view-invoice">View Invoice</span></a>
             <a href="Record Payment.html" class="btn primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-payment">New Payment</span></a>
           </div>
         </div>
@@ -426,11 +217,11 @@ html[dir="rtl"] .m-stepper{direction:ltr}
 </main>
 </div>
 
-<!-- MOBILE -->
+<!-- =================== MOBILE =================== -->
 <div class="mobile-wrap">
   <div class="mobile-frame">
     <div class="m-topbar">
-      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px" onclick="if(mStep>1)setMStep(mStep-1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px" onclick="if(stepper.get()>1)stepper.back()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div style="text-align:center"><div class="m-eyebrow" data-i18n="crumb-record">Record Payment</div><h1 id="m-step-title">Select Invoice</h1></div>
       <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
     </div>
@@ -502,27 +293,39 @@ html[dir="rtl"] .m-stepper{direction:ltr}
       </div>
     </div>
     <div class="mobile-footer" id="m-footer">
-      <button class="btn" id="m-btn-back" onclick="mNav(-1)" data-i18n="btn-back">Back</button>
-      <button class="btn primary" id="m-btn-next" onclick="mNav(1)" style="justify-content:center" data-i18n="btn-next">Next</button>
+      <button class="btn" id="m-btn-back" onclick="stepper.back()" data-i18n="btn-back">Back</button>
+      <button class="btn primary" id="m-btn-next" onclick="stepper.next()" style="justify-content:center" data-i18n="btn-next">Next</button>
     </div>
   </div>
 </div>
 
-<script>
-const INVOICES=[
-  {ref:'INV-2023-007',cust:'Alex Thompson',sub:'Installment · 3 payments · $92.49 total',balance:41.66,status:'partial',note:'Installments #2 & #3 pending'},
-  {ref:'INV-2023-019',cust:'Sara Mendes',sub:'Credit · $215.00 total',balance:215.00,status:'overdue',note:'Overdue since Dec 01'},
-];
-let selectedInv=0;
+<!-- Shared scripts -->
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/view.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/format.js"></script>
+<script src="assets/js/data-loader.js"></script>
+<script src="assets/js/app-bootstrap.js"></script>
 
-function renderInvOptions(container,prefix){
-  container.innerHTML='';
-  INVOICES.forEach((inv,i)=>{
-    const el=document.createElement('div');
-    el.className='inv-option'+(i===selectedInv?' selected':'');
-    el.onclick=()=>{selectedInv=i;renderInvOptions(container,prefix);};
-    el.innerHTML=`
-      <div class="check">${i===selectedInv?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>':''}</div>
+<!-- Components -->
+<script src="components/topbar.js"></script>
+<script src="components/stepper.js"></script>
+
+<!-- Page logic -->
+<script>
+let outstandingInvoices = [];
+let allocations = [];
+let selectedInv = 0;
+let stepper = null;
+
+function renderInvOptions(container) {
+  container.innerHTML = '';
+  outstandingInvoices.forEach((inv, i) => {
+    const el = document.createElement('div');
+    el.className = 'inv-option' + (i === selectedInv ? ' selected' : '');
+    el.onclick = () => { selectedInv = i; renderInvOptions(container); };
+    el.innerHTML = `
+      <div class="check">${i === selectedInv ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>' : ''}</div>
       <div class="info">
         <div class="ref">${inv.ref}</div>
         <div class="cust">${inv.cust}</div>
@@ -536,204 +339,84 @@ function renderInvOptions(container,prefix){
   });
 }
 
-function renderAllocItems(container){
-  const items=[
-    {label:'Installment #2',sub:'Due Jan 01, 2024',amt:'$20.83',overdue:false,checked:true},
-    {label:'Installment #3',sub:'Due Feb 01, 2024',amt:'$20.83',overdue:false,checked:false},
-  ];
-  container.innerHTML='';
-  items.forEach(item=>{
-    const el=document.createElement('div');
-    el.className='alloc-item'+(item.overdue?' overdue':'')+(item.checked?' selected':'');
-    el.innerHTML=`<input type="checkbox" ${item.checked?'checked':''}/><div class="al"><div class="t">${item.label}</div><div class="s">${item.sub}</div></div><div class="amt">${item.amt}</div>`;
+function renderAllocItems(container) {
+  container.innerHTML = '';
+  allocations.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'alloc-item' + (item.overdue ? ' overdue' : '') + (item.checked ? ' selected' : '');
+    el.innerHTML = `<input type="checkbox" ${item.checked ? 'checked' : ''}/><div class="al"><div class="t">${item.label}</div><div class="s">${item.sub}</div></div><div class="amt">$${item.amount.toFixed(2)}</div>`;
     container.appendChild(el);
   });
 }
 
-renderInvOptions(document.getElementById('inv-options'),'d');
-renderInvOptions(document.getElementById('m-inv-options'),'m');
-renderAllocItems(document.getElementById('alloc-items'));
-renderAllocItems(document.getElementById('m-alloc-items'));
-
-function setAmt(v){document.getElementById('pay-amount').value=v;updateSummary();}
-function updateSummary(){
-  const a=parseFloat(document.getElementById('pay-amount').value)||0;
-  const r=Math.max(0,41.66-a);
-  document.getElementById('s-this').textContent='$'+a.toFixed(2);
-  document.getElementById('s-after').textContent='$'+r.toFixed(2);
-  document.getElementById('je-dr').textContent='DR $'+a.toFixed(2);
-  document.getElementById('je-cr').textContent='CR $'+a.toFixed(2);
-  document.getElementById('rev-amount').textContent='$'+a.toFixed(2);
-  document.getElementById('receipt-amount').textContent='$'+a.toFixed(2);
-  document.getElementById('receipt-remaining').textContent='$'+r.toFixed(2);
-  document.getElementById('final-remaining').textContent='$'+r.toFixed(2);
+function setAmt(v) {
+  document.getElementById('pay-amount').value = v;
+  updateSummary();
 }
 
-// Desktop stepper
-let currentStep=1;
-const STEP_TITLES=['Select Invoice','Payment Details','Review','Receipt'];
-const STEP_TITLES_AR=['اختيار الفاتورة','تفاصيل الدفع','المراجعة','الإيصال'];
-function goStep(n){
-  document.querySelectorAll('.desktop-wrap .step-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+n).classList.add('active');
-  for(let i=1;i<=4;i++){
-    const c=document.getElementById('sc-'+i);
-    c.className='step-circle';
-    if(i<n){c.classList.add('done');c.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg>';}
-    else if(i===n){c.classList.add('active');c.textContent=i;}
-    else{c.textContent=i;}
-    const lbl=c.closest('.step-wrap').querySelector('.step-label');
-    lbl.className='step-label';
-    if(i<n)lbl.classList.add('done');
-    else if(i===n)lbl.classList.add('active');
-    if(i<4){const sl=document.getElementById('sl-'+i);sl.className='step-line'+(i<n?' done':'');}
-  }
-  currentStep=n;
+function updateSummary() {
+  const a = parseFloat(document.getElementById('pay-amount').value) || 0;
+  const r = Math.max(0, 41.66 - a);
+  const formatted = '$' + a.toFixed(2);
+  document.getElementById('s-this').textContent = formatted;
+  document.getElementById('s-after').textContent = '$' + r.toFixed(2);
+  document.getElementById('je-dr').textContent = 'DR ' + formatted;
+  document.getElementById('je-cr').textContent = 'CR ' + formatted;
+  document.getElementById('rev-amount').textContent = formatted;
+  document.getElementById('receipt-amount').textContent = formatted;
+  document.getElementById('receipt-remaining').textContent = '$' + r.toFixed(2);
+  document.getElementById('final-remaining').textContent = '$' + r.toFixed(2);
 }
 
-// Mobile stepper
-let mStep=1;
-function setMStep(n){
-  mStep=n;
-  const lang=document.documentElement.lang;
-  const titles=lang==='ar'?STEP_TITLES_AR:STEP_TITLES;
-  document.getElementById('m-step-title').textContent=titles[n-1];
-  document.querySelectorAll('.mobile-wrap .step-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('m-panel-'+n).classList.add('active');
-  for(let i=1;i<=4;i++){
-    const c=document.getElementById('m-sc-'+i);
-    c.className='m-step';
-    if(i<n){c.classList.add('done');c.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>';}
-    else if(i===n){c.classList.add('active');c.textContent=i;}
-    else{c.textContent=i;}
-    if(i<4){const sl=document.getElementById('m-sl-'+i);sl.className='m-line'+(i<n?' done':'');}
-  }
-  const footer=document.getElementById('m-footer');
-  const btnBack=document.getElementById('m-btn-back');
-  const btnNext=document.getElementById('m-btn-next');
-  if(n===4){footer.style.display='none';}
-  else{footer.style.display='';}
-  btnBack.style.display=n===1?'none':'';
-  btnNext.textContent=n===3?(lang==='ar'?T.ar['btn-confirm-post']:T.en['btn-confirm-post']):(lang==='ar'?T.ar['btn-next']:T.en['btn-next']);
+function updateMobileNavLabels(stepNum) {
+  const footer = document.getElementById('m-footer');
+  const btnBack = document.getElementById('m-btn-back');
+  const btnNext = document.getElementById('m-btn-next');
+  footer.style.display = stepNum === 4 ? 'none' : '';
+  btnBack.style.display = stepNum === 1 ? 'none' : '';
+  btnNext.textContent = stepNum === 3
+    ? AppI18n.t('btn-confirm-post')
+    : AppI18n.t('btn-next');
 }
-function mNav(d){const n=Math.min(4,Math.max(1,mStep+d));setMStep(n);}
 
-// seg
-document.addEventListener('click',e=>{
-  const t=e.target.closest('.seg button');if(!t)return;
-  t.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+// Segmented control toggle
+document.addEventListener('click', e => {
+  const t = e.target.closest('.seg button');
+  if (!t) return;
+  t.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   t.classList.add('active');
 });
 
-// theme & view
-const root=document.documentElement;
-const t0=localStorage.getItem('invoice-theme')||'light';
-root.setAttribute('data-theme',t0);updateTheme();
-document.getElementById('theme-toggle').addEventListener('click',()=>{
-  const t=root.getAttribute('data-theme')==='dark'?'light':'dark';
-  root.setAttribute('data-theme',t);localStorage.setItem('invoice-theme',t);updateTheme();
-});
-function updateTheme(){
-  const t=root.getAttribute('data-theme');
-  document.getElementById('theme-label').textContent=t==='dark'?(currentLang==='ar'?'داكن':'Dark'):(currentLang==='ar'?'فاتح':'Light');
-  document.getElementById('theme-icon').innerHTML=t==='dark'
-    ?'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'
-    :'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
-}
-const body=document.body;
-const sv=localStorage.getItem('invoice-view')||'desktop';
-body.setAttribute('data-view',sv);
-document.querySelectorAll('.view-toggle button').forEach(b=>{
-  b.classList.toggle('active',b.dataset.view===sv);
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('.view-toggle button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');body.setAttribute('data-view',b.dataset.view);
-    localStorage.setItem('invoice-view',b.dataset.view);
-  });
+AppBootstrap.init({
+  i18n: ['demo-i18n-common', 'demo-i18n-record-payment'],
+  afterReady: () => {
+    AppDataLoader.load('demo-payment-options').then(data => {
+      if (!data) return;
+      outstandingInvoices = data.outstandingInvoices;
+      allocations = data.allocations;
+
+      renderInvOptions(document.getElementById('inv-options'));
+      renderInvOptions(document.getElementById('m-inv-options'));
+      renderAllocItems(document.getElementById('alloc-items'));
+      renderAllocItems(document.getElementById('m-alloc-items'));
+
+      stepper = AppStepper.create({
+        steps: [
+          { id: 1, labelKey: 'step-1' },
+          { id: 2, labelKey: 'step-2' },
+          { id: 3, labelKey: 'step-3' },
+          { id: 4, labelKey: 'step-4' },
+        ],
+        onChange: updateMobileNavLabels,
+      });
+      stepper.go(1);
+
+      AppI18n.apply();
+    });
+  },
 });
 
-// i18n
-const T={
-  en:{
-    'nav-invoices':'Invoices','crumb-invoice':'INV-2023-007','crumb-record':'Record Payment',
-    'step-1':'Select Invoice','step-2':'Payment Details','step-3':'Review','step-4':'Receipt',
-    'step-1-title':'Select Invoice to Pay','step-1-sub':'Choose one or more outstanding invoices for this customer.',
-    'step-2-title':'Payment Details','step-2-sub':'Enter the amount, method, and account for this payment.',
-    'step-3-title':'Review Payment','step-3-sub':'Confirm all details before posting the journal entry.',
-    'lbl-customer':'Customer','lbl-outstanding':'Outstanding Invoices',
-    'lbl-amount':'Amount','btn-installment-2':'Installment #2','btn-pay-all':'Pay All ($41.66)',
-    'lbl-method':'Payment Method','method-bank':'Bank Transfer','method-cash':'Cash','method-card':'Card',
-    'lbl-account':'Account','acct-main':'Main Bank Account (1002-01)','acct-petty':'Petty Cash (1001-01)',
-    'lbl-date':'Payment Date','lbl-allocate':'Allocate to Installments',
-    'lbl-ref':'Reference / Receipt #','ref-ph':'e.g. BANK-TXN-20240101',
-    'lbl-notes':'Notes','notes-ph':'Optional…',
-    'btn-cancel':'Cancel','btn-next':'Next','btn-back':'Back',
-    'btn-review':'Review','btn-confirm-post':'Confirm & Post',
-    'rev-invoice':'Invoice','rev-payment':'Payment','rev-installment-due':'Installment #2 due Jan 01, 2024',
-    'journal-preview':'Journal Entry Preview','je-cash':'Cash / Bank Account','je-ar':'Accounts Receivable',
-    's-invoice-total':'Invoice Total','s-previously-paid':'Previously Paid','s-this-payment':'This Payment',
-    's-balance-after':'Balance After','s-total-paid':'Total Paid','s-remaining':'Remaining Balance',
-    'review-warning':'Once confirmed, this payment will post a journal entry immediately. This cannot be undone without voiding the payment.',
-    'review-warning-short':'Once confirmed, a journal entry will be posted immediately.',
-    'badge-posted':'Payment Posted','receipt-sub':'Successfully recorded and posted to ledger',
-    'rcpt-invoice':'Invoice','rcpt-date':'Date','rcpt-method':'Method','rcpt-remaining':'Remaining',
-    'success-title':'Payment Recorded Successfully','success-sub':'Journal entries have been posted automatically.',
-    'btn-print':'Print','btn-view-invoice':'View Invoice','btn-new-payment':'New Payment',
-    'search-customer':'Search customer…',
-    'view-desktop':'Desktop','view-mobile':'Mobile','theme-light':'Light','theme-dark':'Dark',
-  },
-  ar:{
-    'nav-invoices':'الفواتير','crumb-invoice':'INV-2023-007','crumb-record':'تسجيل دفعة',
-    'step-1':'اختيار الفاتورة','step-2':'تفاصيل الدفع','step-3':'المراجعة','step-4':'الإيصال',
-    'step-1-title':'اختر الفاتورة للسداد','step-1-sub':'اختر فاتورة واحدة أو أكثر من الفواتير المستحقة لهذا العميل.',
-    'step-2-title':'تفاصيل الدفع','step-2-sub':'أدخل المبلغ وطريقة الدفع والحساب.',
-    'step-3-title':'مراجعة الدفع','step-3-sub':'تأكيد جميع التفاصيل قبل ترحيل القيد المحاسبي.',
-    'lbl-customer':'العميل','lbl-outstanding':'الفواتير المستحقة',
-    'lbl-amount':'المبلغ','btn-installment-2':'القسط الثاني','btn-pay-all':'سداد الكل ($41.66)',
-    'lbl-method':'طريقة الدفع','method-bank':'تحويل بنكي','method-cash':'نقداً','method-card':'بطاقة',
-    'lbl-account':'الحساب','acct-main':'الحساب البنكي الرئيسي (1002-01)','acct-petty':'النقدية الصغيرة (1001-01)',
-    'lbl-date':'تاريخ الدفع','lbl-allocate':'توزيع على الأقساط',
-    'lbl-ref':'المرجع / رقم الإيصال','ref-ph':'مثال: BANK-TXN-20240101',
-    'lbl-notes':'ملاحظات','notes-ph':'اختياري…',
-    'btn-cancel':'إلغاء','btn-next':'التالي','btn-back':'السابق',
-    'btn-review':'مراجعة','btn-confirm-post':'تأكيد وترحيل',
-    'rev-invoice':'الفاتورة','rev-payment':'الدفع','rev-installment-due':'القسط الثاني - استحقاق 01 يناير 2024',
-    'journal-preview':'معاينة القيد المحاسبي','je-cash':'النقد / الحساب البنكي','je-ar':'الذمم المدينة',
-    's-invoice-total':'إجمالي الفاتورة','s-previously-paid':'المدفوع سابقاً','s-this-payment':'هذه الدفعة',
-    's-balance-after':'الرصيد بعد الدفع','s-total-paid':'إجمالي المدفوع','s-remaining':'الرصيد المتبقي',
-    'review-warning':'بعد التأكيد، سيتم ترحيل القيد المحاسبي فوراً. لا يمكن التراجع عن ذلك بدون إلغاء الدفعة.',
-    'review-warning-short':'بعد التأكيد، سيتم ترحيل القيد المحاسبي فوراً.',
-    'badge-posted':'تم ترحيل الدفعة','receipt-sub':'تم التسجيل والترحيل بنجاح',
-    'rcpt-invoice':'الفاتورة','rcpt-date':'التاريخ','rcpt-method':'طريقة الدفع','rcpt-remaining':'المتبقي',
-    'success-title':'تم تسجيل الدفعة بنجاح','success-sub':'تم ترحيل القيود المحاسبية تلقائياً.',
-    'btn-print':'طباعة','btn-view-invoice':'عرض الفاتورة','btn-new-payment':'دفعة جديدة',
-    'search-customer':'ابحث عن عميل…',
-    'view-desktop':'سطح المكتب','view-mobile':'الجوال','theme-light':'فاتح','theme-dark':'داكن',
-  }
-};
-let currentLang=localStorage.getItem('invoice-lang')||'en';
-function applyLang(lang){
-  currentLang=lang;root.lang=lang;root.dir=lang==='ar'?'rtl':'ltr';
-  localStorage.setItem('invoice-lang',lang);
-  document.getElementById('lang-label').textContent=lang==='ar'?'EN':'عربي';
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.dataset.i18n;if(T[lang][k]!==undefined)el.innerHTML=T[lang][k];
-  });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
-    const k=el.dataset.i18nPh;if(T[lang]&&T[lang][k])el.placeholder=T[lang][k];
-  });
-  document.querySelectorAll('.view-toggle button').forEach(b=>{
-    if(b.dataset.view==='desktop') b.childNodes[b.childNodes.length-1].textContent=' '+T[lang]['view-desktop'];
-    if(b.dataset.view==='mobile')  b.childNodes[b.childNodes.length-1].textContent=' '+T[lang]['view-mobile'];
-  });
-  // update mobile step title
-  const titles=lang==='ar'?STEP_TITLES_AR:STEP_TITLES;
-  document.getElementById('m-step-title').textContent=titles[mStep-1];
-  updateTheme();
-}
-document.getElementById('lang-toggle').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
-applyLang(currentLang);
-setMStep(1);
+AppI18n.onChange(() => { if (stepper) updateMobileNavLabels(stepper.get()); });
 </script>
 <script src="arabic-page-helper.js"></script>
 </body>

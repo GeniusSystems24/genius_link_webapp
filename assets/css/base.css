@@ -1,8 +1,0 @@
-/* ─── Base resets + typography ─── */
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{font-family:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.4}
-html[dir="rtl"] body{font-family:'Cairo',system-ui,sans-serif}
-.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
-.num{font-variant-numeric:tabular-nums}
-html[dir="rtl"] .mono{font-family:'JetBrains Mono',monospace}

@@ -1,0 +1,20 @@
+@page "/"
+@inject NavigationManager Navigation
+
+<PageTitle>Genius Link</PageTitle>
+
+<main style="font-family:system-ui,sans-serif;padding:32px">
+    <h1>Genius Link</h1>
+    <p>Opening the invoice list...</p>
+    <p><a href="Invoice List.html">Open invoice list</a></p>
+</main>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Navigation.NavigateTo("Invoice List.html", forceLoad: true);
+        }
+    }
+}

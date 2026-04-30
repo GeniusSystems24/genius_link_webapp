@@ -1,0 +1,321 @@
+/* ─── Sale Invoice Details — page-specific styles
+ *     Shared by the Cash and Installment variants. ─── */
+
+/* page header tweaks for invoice header */
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.page-head h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0}
+.page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+/* status (the larger header status badge) */
+.status{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em}
+.status .dot{width:7px;height:7px;border-radius:50%}
+.status.paid{background:var(--success-soft);color:var(--success-ink)}
+.status.paid .dot{background:var(--success)}
+.status.partial{background:var(--amber-soft);color:var(--amber-ink)}
+.status.partial .dot{background:var(--amber)}
+.status.refunded{background:var(--danger-soft);color:var(--danger-ink)}
+.status.refunded .dot{background:var(--danger)}
+.status.voided{background:var(--surface-3);color:var(--text-dim)}
+.status.voided .dot{background:var(--text-dim)}
+
+/* card override (uses accent-bar variable) */
+.card-head{padding:18px 22px 0}
+.card-title{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}
+.card-title::before{background:var(--accent-bar)}
+.card-sub{margin:4px 0 0 13px}
+.card-body{padding:16px 22px 22px}
+
+/* summary strip */
+.summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.strip-cell{background:var(--surface);padding:18px 22px;display:flex;flex-direction:column;gap:5px}
+.strip-cell .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+.strip-cell .val{font-size:24px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.strip-cell .val.success{color:var(--success)}
+.strip-cell .val.danger{color:var(--danger)}
+.strip-cell .val.primary{color:var(--primary)}
+.strip-cell .val.amber{color:var(--amber)}
+.strip-cell .sub{font-size:12px;color:var(--text-muted)}
+.strip-cell.accent-success{background:color-mix(in oklab,var(--success-soft) 55%,var(--surface))}
+.strip-cell.accent{background:color-mix(in oklab,var(--primary-soft) 55%,var(--surface))}
+@media(max-width:640px){.summary-strip{grid-template-columns:1fr 1fr}}
+
+/* receipt banner (cash) */
+.receipt-banner{background:linear-gradient(135deg,var(--success),color-mix(in oklab,var(--success) 60%,#0ea5e9));border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;color:#fff;flex-wrap:wrap}
+.receipt-banner .rb-left{display:flex;align-items:center;gap:14px}
+.receipt-banner .rb-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.22);display:grid;place-items:center}
+.receipt-banner .rb-title{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.receipt-banner .rb-sub{font-size:12.5px;opacity:.85;margin-top:3px}
+.receipt-banner .rb-amount{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.receipt-banner .rb-amt-sub{font-size:12px;opacity:.75;text-align:right;margin-top:2px}
+
+/* two-col override */
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:flex-start}
+@media(max-width:960px){.two-col{grid-template-columns:1fr}}
+
+/* info grid */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+.info-item .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:4px}
+.info-item .v{font-size:13.5px;font-weight:600}
+.info-item .v.muted{color:var(--text-muted)}
+
+/* customer card inside details */
+.cust-card{display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px}
+.cust-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,var(--success));display:grid;place-items:center;color:#fff;font-size:18px;font-weight:700;flex:none}
+.cust-info .name{font-weight:700;font-size:14px}
+.cust-info .sub{color:var(--text-muted);font-size:12px;margin-top:2px}
+.cust-info .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+/* products table */
+.pthead{display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 1.1fr;gap:14px;padding:10px 14px;color:var(--text-dim);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.ptrow{display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 1.1fr;gap:14px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:center}
+.ptrow:last-child{border-bottom:0}
+.pthumb{width:34px;height:34px;border-radius:8px;background:var(--surface-3);display:grid;place-items:center;flex:none;font-size:18px}
+.pname{display:flex;align-items:center;gap:10px;min-width:0}
+.pt{font-weight:600;font-size:13.5px}
+.ps{color:var(--text-dim);font-size:11.5px}
+
+/* additional cost rows */
+.ctrow{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);gap:14px}
+.ctrow:last-child{border-bottom:0}
+.ctrow .cl{display:flex;align-items:center;gap:10px;font-weight:600;font-size:13px}
+.ctrow .cr{font-weight:700;font-size:13.5px;font-variant-numeric:tabular-nums}
+
+/* payment row (single payment - used by cash variant) */
+.pay-row{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:16px 18px}
+.pay-dot{width:44px;height:44px;border-radius:50%;background:var(--success-soft);border:2px solid var(--success);display:grid;place-items:center;flex:none;color:var(--success-ink)}
+.pay-body .pt{font-weight:700;font-size:14px}
+.pay-body .ps{color:var(--text-muted);font-size:12px;margin-top:3px}
+.pay-body .tags{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.pay-right{text-align:right}
+.pay-right .amt{font-weight:700;font-size:20px;color:var(--success);font-variant-numeric:tabular-nums}
+.pay-right .change{font-size:12.5px;color:var(--text-muted);margin-top:3px}
+
+/* change box (cash) */
+.change-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 18px 16px;padding:14px;background:var(--success-soft);border:1px solid color-mix(in oklab,var(--success) 30%,var(--border));border-radius:12px}
+.cb-cell{display:flex;flex-direction:column;gap:4px}
+.cb-cell .ck{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--success-ink);font-weight:600;opacity:.8}
+.cb-cell .cv{font-size:18px;font-weight:700;color:var(--success-ink);font-variant-numeric:tabular-nums}
+
+/* journal entries table */
+.je-table{width:100%;border-collapse:collapse;font-size:13px}
+.je-table th{text-align:left;padding:8px 12px;color:var(--text-dim);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.je-table td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.je-table tr:last-child td{border-bottom:0}
+.je-table .acc{color:var(--text);font-weight:600}
+.je-table .acc-code{color:var(--text-muted);font-size:11.5px;margin-top:1px}
+.je-table .dr{color:var(--primary);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.je-table .cr{color:var(--success);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.je-table .empty{color:var(--text-dim)}
+.je-table .highlight td{background:color-mix(in oklab,var(--success-soft) 40%,var(--surface))}
+
+/* totals stack (right sidebar) */
+.totals-stack{display:flex;flex-direction:column}
+.trow-total{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;gap:12px}
+.trow-total .k{color:var(--text-muted)}
+.trow-total .v{font-weight:600;font-variant-numeric:tabular-nums}
+.trow-total .v.neg{color:var(--danger)}
+.trow-total .v.pos{color:var(--success)}
+.trow-divider{height:1px;background:var(--border);margin:8px 0}
+.grand-row{display:flex;justify-content:space-between;align-items:baseline;padding-top:4px}
+.grand-row .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);font-weight:700}
+.grand-row .v{font-size:26px;font-weight:700;color:var(--success);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+
+/* activity log */
+.activity{display:flex;flex-direction:column;gap:12px}
+.activity .act-item{align-items:flex-start;gap:12px;border-bottom:0;padding:0}
+
+/* sidebar action card */
+.sidebar{display:flex;flex-direction:column;gap:12px;position:sticky;top:76px}
+.action-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.a-body{padding:16px}
+.a-title{font-weight:700;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.a-row{display:flex;flex-direction:column;gap:8px}
+.q-stat,.quick-stat{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.q-stat:last-child,.quick-stat:last-child{border-bottom:0}
+.q-stat .qk,.quick-stat .qk{color:var(--text-muted)}
+.q-stat .qv,.quick-stat .qv{font-weight:700;font-variant-numeric:tabular-nums}
+
+/* installment timeline */
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:grid;grid-template-columns:60px 1fr auto;gap:0 14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.tl-item:last-child{border-bottom:0}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center}
+.tl-dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;font-weight:700;font-size:13px}
+.tl-dot.paid{background:var(--success-soft);color:var(--success-ink);border:2px solid var(--success)}
+.tl-dot.due{background:var(--amber-soft);color:var(--amber-ink);border:2px solid var(--amber)}
+.tl-dot.overdue{background:var(--danger-soft);color:var(--danger-ink);border:2px solid var(--danger)}
+.tl-dot.upcoming{background:var(--surface-2);color:var(--text-dim);border:2px dashed var(--border-strong)}
+.tl-line{width:2px;background:var(--border);flex:1;margin-top:3px}
+.tl-body .inst-no{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:3px}
+html[dir="rtl"] .tl-body .inst-no{letter-spacing:0}
+.tl-body .date-label{font-weight:600;font-size:14px}
+.tl-body .date-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.tl-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.tl-right .tl-amount{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.tl-actions{margin-top:8px}
+
+/* payment progress bar */
+.pay-track{height:10px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin:8px 0}
+.pay-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--success),color-mix(in oklab,var(--success) 70%,#0ea5e9))}
+.pay-labels{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted)}
+
+/* mobile stat grid */
+.m-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.m-stat .lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:4px}
+html[dir="rtl"] .m-stat .lbl{letter-spacing:0}
+.m-stat .val{font-size:20px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.m-stat.success .val{color:var(--success)}
+.m-stat.danger .val{color:var(--danger)}
+.m-stat.primary{background:color-mix(in oklab,var(--primary-soft) 70%,var(--surface))}
+.m-stat.primary .val{color:var(--primary-ink)}
+html[dir="rtl"] .m-stat-grid{direction:rtl}
+
+/* mobile receipt banner (cash) */
+.m-receipt{background:linear-gradient(135deg,var(--success),color-mix(in oklab,var(--success) 65%,#0ea5e9));border-radius:16px;padding:16px;margin-bottom:12px;color:#fff}
+.m-receipt .mr-status{font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.8;font-weight:600;margin-bottom:8px}
+.m-receipt .mr-title{font-size:16px;font-weight:700}
+.m-receipt .mr-ref{font-size:11px;opacity:.75;margin-top:2px}
+.m-receipt .mr-amount{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:12px}
+.m-receipt .mr-sub{font-size:11.5px;opacity:.8;margin-top:2px}
+.m-receipt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.m-receipt .mr-stat{background:rgba(255,255,255,.18);border-radius:10px;padding:10px 12px}
+.m-receipt .mr-stat .sl{font-size:10px;opacity:.75;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.m-receipt .mr-stat .sv{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* mobile product / totals / je / timeline */
+.m-prod{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.m-prod:last-child{border-bottom:0}
+.m-prod-icon{width:32px;height:32px;border-radius:8px;background:var(--surface-3);display:grid;place-items:center;flex:none;font-size:16px}
+.m-totrow{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--border)}
+.m-totrow:last-child{border-bottom:0}
+.m-totrow .k{color:var(--text-muted)}
+.m-totrow .v{font-weight:600;font-variant-numeric:tabular-nums}
+.m-grand{display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;margin-top:4px;border-top:1px solid var(--border)}
+.m-grand .k{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);font-weight:700}
+.m-grand .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--success)}
+.m-tl{display:grid;grid-template-columns:28px 1fr auto;gap:0 12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:start}
+.m-tl:last-child{border-bottom:0}
+.m-tl-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:11px;font-weight:700}
+.m-tl-dot.paid{background:var(--success-soft);color:var(--success-ink);border:2px solid var(--success)}
+.m-tl-dot.due{background:var(--amber-soft);color:var(--amber-ink);border:2px solid var(--amber)}
+.m-tl-dot.overdue{background:var(--danger-soft);color:var(--danger-ink);border:2px solid var(--danger)}
+.m-tl-dot.upcoming{background:var(--surface-2);color:var(--text-dim);border:2px dashed var(--border-strong)}
+.m-tl-body .mn{font-weight:600;font-size:13px}
+.m-tl-body .ms{color:var(--text-dim);font-size:11.5px}
+.m-tl-right{text-align:right}
+.m-tl-right .amt{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
+.m-tl-right .s{color:var(--text-dim);font-size:11px}
+.m-je-list{display:flex;flex-direction:column;gap:8px}
+.m-je-row{border:1px solid var(--border);background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.m-je-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.m-je-acc{font-weight:700;font-size:13px;color:var(--text)}
+.m-je-code{font-size:11px;color:var(--text-muted);margin-top:2px}
+.m-je-desc{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.35}
+.m-je-amt{font-weight:800;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-je-amt.dr{color:var(--primary)}
+.m-je-amt.cr{color:var(--success)}
+.m-je-kind{font-size:10px;color:var(--text-dim);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.m-action-stack{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-action-stack .btn{justify-content:center}
+
+/* refund / void preview boxes inside sheets */
+.refund-preview{background:var(--danger-soft);border:1px solid color-mix(in oklab,var(--danger) 25%,var(--border));border-radius:12px;padding:14px 16px;margin-top:12px}
+.refund-preview .r-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px dashed color-mix(in oklab,var(--danger) 20%,var(--border))}
+.refund-preview .r-row:last-child{border-bottom:0;font-weight:700}
+.refund-preview .rk{color:var(--danger-ink);opacity:.75}
+.s-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.s-field:last-child{margin-bottom:0}
+.s-field label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+
+/* sheet (reused from invoice list css family) */
+.sheet-scrim{position:fixed;inset:0;background:rgba(10,13,20,.5);opacity:0;pointer-events:none;transition:opacity .22s;z-index:100}
+.sheet-scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:100%;max-width:500px;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:var(--shadow-lg);z-index:101;transition:transform .28s cubic-bezier(.2,.9,.3,1);max-height:88vh;display:flex;flex-direction:column}
+.sheet.open{transform:translate(-50%,0)}
+.sheet-handle{height:5px;width:42px;background:var(--border-strong);border-radius:999px;margin:10px auto 4px}
+.sheet-head{padding:8px 20px 14px;border-bottom:1px solid var(--border)}
+.sheet-head h3{margin:0;font-size:17px;font-weight:700}
+.sheet-head .sub{color:var(--text-muted);font-size:12.5px;margin-top:3px}
+.sheet-body{padding:16px 20px;overflow:auto;flex:1}
+.sheet-footer{padding:10px 16px 16px;display:grid;grid-template-columns:1fr 2fr;gap:8px;border-top:1px solid var(--border);background:var(--surface)}
+.input{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font:inherit;font-size:13.5px;transition:border-color .15s,box-shadow .15s;min-height:42px}
+.input:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+.input::placeholder{color:var(--text-dim)}
+.select{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font:inherit;font-size:13.5px;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px;background-size:5px 5px;background-repeat:no-repeat;min-height:42px}
+.select:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+
+/* sheet form helpers — Record Payment / Void sheet */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+html[dir="rtl"] .field label{letter-spacing:0;text-align:right}
+
+.big-amount{position:relative}
+.big-amount .cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:700;font-size:17px;color:var(--text-muted);pointer-events:none}
+html[dir="rtl"] .big-amount .cur{left:auto;right:14px}
+.big-amount .input{padding-left:36px;font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;height:56px;border-radius:12px}
+html[dir="rtl"] .big-amount .input{padding-left:12px;padding-right:36px}
+
+.seg{display:grid;gap:6px;background:var(--surface-2);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.seg.two{grid-template-columns:1fr 1fr}
+.seg button{appearance:none;border:0;background:transparent;padding:8px;border-radius:8px;color:var(--text-muted);font:inherit;font-weight:600;font-size:12.5px;cursor:pointer}
+.seg button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+html[dir="rtl"] .seg{direction:rtl}
+
+.alloc-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.alloc-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px}
+.alloc-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;flex:none}
+.alloc-item .ai-body{flex:1;min-width:0}
+.alloc-item .ai-t{font-weight:600;font-size:13.5px}
+.alloc-item .ai-s{color:var(--text-dim);font-size:11.5px;margin-top:2px}
+.alloc-item .ai-r{font-weight:700;font-variant-numeric:tabular-nums}
+.alloc-item.due{border-color:color-mix(in oklab,var(--amber) 35%,var(--border))}
+.alloc-item.overdue{border-color:var(--danger);background:var(--danger-soft)}
+html[dir="rtl"] .alloc-item{flex-direction:row-reverse}
+
+.pay-receipt{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:14px}
+.pay-receipt .r-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.pay-receipt .r-row:last-child{border-bottom:0;font-weight:700}
+.pay-receipt .r-row .rk{color:var(--text-muted)}
+html[dir="rtl"] .pay-receipt .r-row{flex-direction:row-reverse}
+
+.void-warn{background:var(--danger-soft);border:1px solid var(--danger);border-radius:12px;padding:14px 16px;color:var(--danger-ink);font-size:13.5px;line-height:1.6;margin-bottom:14px}
+
+/* RTL */
+html[dir="rtl"] .page-actions{flex-direction:row-reverse}
+html[dir="rtl"] .receipt-banner,
+html[dir="rtl"] .receipt-banner .rb-left{flex-direction:row-reverse}
+html[dir="rtl"] .rb-amt-sub{text-align:left}
+html[dir="rtl"] .pthead,
+html[dir="rtl"] .ptrow{direction:rtl}
+html[dir="rtl"] .ptrow .pname{flex-direction:row-reverse}
+html[dir="rtl"] .timeline .tl-item{direction:rtl}
+html[dir="rtl"] .tl-right{align-items:flex-start}
+html[dir="rtl"] .je-table{direction:rtl}
+html[dir="rtl"] .je-table th,
+html[dir="rtl"] .je-table td{text-align:right}
+html[dir="rtl"] .je-table .dr,
+html[dir="rtl"] .je-table .cr{text-align:left}
+html[dir="rtl"] .info-grid{direction:rtl}
+html[dir="rtl"] .cust-card{flex-direction:row-reverse}
+html[dir="rtl"] .cust-info .tags{flex-direction:row-reverse}
+html[dir="rtl"] .totals-stack .trow-total{flex-direction:row-reverse}
+html[dir="rtl"] .grand-row{flex-direction:row-reverse}
+html[dir="rtl"] .a-title{flex-direction:row-reverse}
+html[dir="rtl"] .a-row .btn{flex-direction:row-reverse}
+html[dir="rtl"] .q-stat,
+html[dir="rtl"] .quick-stat{flex-direction:row-reverse}
+html[dir="rtl"] .sheet{font-family:'Cairo',system-ui,sans-serif;direction:rtl}
+html[dir="rtl"] .sheet-footer{direction:rtl}
+html[dir="rtl"] .ctrow{flex-direction:row-reverse}
+html[dir="rtl"] .pay-row{direction:rtl}
+html[dir="rtl"] .pay-labels{flex-direction:row-reverse}
+
+/* mobile RTL */
+html[dir="rtl"] .m-tl{direction:rtl}
+html[dir="rtl"] .m-tl-right{text-align:left}
+html[dir="rtl"] .m-prod{direction:rtl}
+html[dir="rtl"] .m-totrow,
+html[dir="rtl"] .m-grand{flex-direction:row-reverse}

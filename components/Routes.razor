@@ -1,0 +1,14 @@
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <main style="font-family:system-ui,sans-serif;padding:32px">
+            <h1>Page not found</h1>
+            <p>The requested route does not exist.</p>
+            <a href="Invoice List.html">Open invoice list</a>
+        </main>
+    </NotFound>
+</Router>

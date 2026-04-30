@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Record Payment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/record-payment.css">
+</head>
+<body data-view="desktop">
+
+<!-- Topbar (rendered by components/topbar.js) -->
+<div data-component="topbar"
+     data-brand-href="Invoice List.html"
+     data-crumbs='[{"label":"Invoices","href":"Invoice List.html","key":"nav-invoices"},{"label":"INV-2023-007","href":"Sale Invoice Details.html","key":"crumb-invoice"},{"label":"Record Payment","key":"crumb-record"}]'></div>
+
+<!-- =================== DESKTOP =================== -->
+<div class="desktop-wrap">
+<main class="page">
+
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <div class="step-wrap"><div class="step-circle active" id="sc-1">1</div><div class="step-label active" data-i18n="step-1">Select Invoice</div></div>
+    <div class="step-line" id="sl-1"></div>
+    <div class="step-wrap"><div class="step-circle" id="sc-2">2</div><div class="step-label" data-i18n="step-2">Payment Details</div></div>
+    <div class="step-line" id="sl-2"></div>
+    <div class="step-wrap"><div class="step-circle" id="sc-3">3</div><div class="step-label" data-i18n="step-3">Review</div></div>
+    <div class="step-line" id="sl-3"></div>
+    <div class="step-wrap"><div class="step-circle" id="sc-4">4</div><div class="step-label" data-i18n="step-4">Receipt</div></div>
+  </div>
+
+  <!-- Step 1: Select Invoice -->
+  <div class="step-panel active" id="panel-1">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title" data-i18n="step-1-title">Select Invoice to Pay</div>
+        <div class="card-sub" data-i18n="step-1-sub">Choose one or more outstanding invoices for this customer.</div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label data-i18n="lbl-customer">Customer</label>
+          <div style="position:relative"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input class="input" style="padding-left:36px" value="Alex Thompson (#F-062)" data-i18n-ph="search-customer"/></div>
+        </div>
+        <div class="field">
+          <label data-i18n="lbl-outstanding">Outstanding Invoices</label>
+          <div id="inv-options"></div>
+        </div>
+        <div class="step-nav">
+          <a href="Sale Invoice Details.html" class="btn ghost" data-i18n="btn-cancel">Cancel</a>
+          <button class="btn primary" onclick="stepper.go(2)">
+            <span data-i18n="btn-next">Next</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Payment Details -->
+  <div class="step-panel" id="panel-2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title" data-i18n="step-2-title">Payment Details</div>
+        <div class="card-sub" data-i18n="step-2-sub">Enter the amount, method, and account for this payment.</div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label data-i18n="lbl-amount">Amount</label>
+          <div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" id="pay-amount" value="20.83" inputmode="decimal" oninput="updateSummary()"/></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn" style="font-size:12px;padding:6px 12px" onclick="setAmt('20.83')" data-i18n="btn-installment-2">Installment #2</button>
+            <button class="btn" style="font-size:12px;padding:6px 12px" onclick="setAmt('41.66')" data-i18n="btn-pay-all">Pay All ($41.66)</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="lbl-method">Payment Method</label>
+          <div class="seg cols3" id="pay-method-seg">
+            <button class="active" data-v="bank" data-i18n="method-bank">Bank Transfer</button>
+            <button data-v="cash" data-i18n="method-cash">Cash</button>
+            <button data-v="card" data-i18n="method-card">Card</button>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label data-i18n="lbl-account">Account</label>
+            <select class="select"><option data-i18n="acct-main">Main Bank Account (1002-01)</option><option data-i18n="acct-petty">Petty Cash (1001-01)</option></select>
+          </div>
+          <div class="field">
+            <label data-i18n="lbl-date">Payment Date</label>
+            <input class="input" type="date" value="2024-01-01"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="lbl-allocate">Allocate to Installments</label>
+          <div id="alloc-items"></div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="lbl-ref">Reference / Receipt #</label>
+          <input class="input" placeholder="e.g. BANK-TXN-20240101" data-i18n-ph="ref-ph"/>
+        </div>
+
+        <div class="field">
+          <label data-i18n="lbl-notes">Notes</label>
+          <input class="input" placeholder="Optional…" data-i18n-ph="notes-ph"/>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn ghost" onclick="stepper.go(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
+          <button class="btn primary" onclick="stepper.go(3)"><span data-i18n="btn-review">Review</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Review -->
+  <div class="step-panel" id="panel-3">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title" data-i18n="step-3-title">Review Payment</div>
+        <div class="card-sub" data-i18n="step-3-sub">Confirm all details before posting the journal entry.</div>
+      </div>
+      <div class="card-body">
+        <div class="grid2" style="margin-bottom:16px">
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px">
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px" data-i18n="rev-invoice">Invoice</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--primary)">INV-2023-007</div>
+            <div style="font-weight:600;margin-top:4px">Alex Thompson</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px" data-i18n="rev-installment-due">Installment #2 due Jan 01, 2024</div>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px">
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px" data-i18n="rev-payment">Payment</div>
+            <div id="rev-amount" style="font-size:22px;font-weight:700;color:var(--success);font-variant-numeric:tabular-nums">$20.83</div>
+            <div id="rev-method" style="font-size:12.5px;color:var(--text-muted);margin-top:4px">Bank Transfer · Main Bank Account</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:2px">Jan 01, 2024</div>
+          </div>
+        </div>
+
+        <!-- Journal preview -->
+        <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
+          <div style="padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600" data-i18n="journal-preview">Journal Entry Preview</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:13px;align-items:center">
+            <div><div style="font-weight:600" data-i18n="je-cash">Cash / Bank Account</div><div style="font-size:11.5px;color:var(--text-muted)" class="mono">1002-01</div></div>
+            <div style="text-align:right"><div style="color:var(--primary);font-weight:700" id="je-dr">DR $20.83</div></div>
+          </div>
+          <div style="padding:10px 14px;display:flex;justify-content:space-between;font-size:13px;align-items:center">
+            <div><div style="font-weight:600" data-i18n="je-ar">Accounts Receivable</div><div style="font-size:11.5px;color:var(--text-muted)" class="mono">1200-01</div></div>
+            <div style="text-align:right"><div style="color:var(--success);font-weight:700" id="je-cr">CR $20.83</div></div>
+          </div>
+        </div>
+
+        <!-- Balance summary -->
+        <div class="summary-box">
+          <div class="s-row"><span class="k" data-i18n="s-invoice-total">Invoice Total</span><span class="v">$92.49</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-previously-paid">Previously Paid</span><span class="v">$50.83</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-this-payment">This Payment</span><span class="v success" id="s-this">$20.83</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-balance-after">Balance After</span><span class="v danger" id="s-after">$20.83</span></div>
+        </div>
+
+        <div style="background:var(--amber-soft);border:1px solid var(--amber);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;color:var(--amber-ink)" data-i18n="review-warning">
+          Once confirmed, this payment will post a journal entry immediately. This cannot be undone without voiding the payment.
+        </div>
+
+        <div class="step-nav">
+          <button class="btn ghost" onclick="stepper.go(2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
+          <button class="btn primary" onclick="stepper.go(4)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
+            <span data-i18n="btn-confirm-post">Confirm & Post</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Receipt -->
+  <div class="step-panel" id="panel-4">
+    <div class="success-anim">
+      <div class="receipt">
+        <div class="r-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg><span data-i18n="badge-posted">Payment Posted</span></div>
+        <div class="r-amount" id="receipt-amount">$20.83</div>
+        <div class="r-sub" data-i18n="receipt-sub">Successfully recorded and posted to ledger</div>
+        <div class="r-grid">
+          <div class="r-cell"><div class="rl" data-i18n="rcpt-invoice">Invoice</div><div class="rv mono">INV-2023-007</div></div>
+          <div class="r-cell"><div class="rl" data-i18n="rcpt-date">Date</div><div class="rv">Jan 01, 2024</div></div>
+          <div class="r-cell"><div class="rl" data-i18n="rcpt-method">Method</div><div class="rv" data-i18n="method-bank">Bank Transfer</div></div>
+          <div class="r-cell"><div class="rl" data-i18n="rcpt-remaining">Remaining</div><div class="rv" id="receipt-remaining">$20.83</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div style="text-align:center;padding:8px 0 16px">
+            <div class="check-circle success-anim"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg></div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:6px" data-i18n="success-title">Payment Recorded Successfully</div>
+            <div style="color:var(--text-muted);font-size:13px" data-i18n="success-sub">Journal entries have been posted automatically.</div>
+          </div>
+          <div class="summary-box" style="margin-bottom:20px">
+            <div class="s-row"><span class="k" data-i18n="s-invoice-total">Invoice Total</span><span class="v">$92.49</span></div>
+            <div class="s-row"><span class="k" data-i18n="s-total-paid">Total Paid</span><span class="v success">$71.66</span></div>
+            <div class="s-row"><span class="k" data-i18n="s-remaining">Remaining Balance</span><span class="v danger" id="final-remaining">$20.83</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <button class="btn" onclick="window.print()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg><span data-i18n="btn-print">Print</span></button>
+            <a href="Sale Invoice Details.html" class="btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7-11-7-11-7z"/></svg><span data-i18n="btn-view-invoice">View Invoice</span></a>
+            <a href="Record Payment.html" class="btn primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-payment">New Payment</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- =================== MOBILE =================== -->
+<div class="mobile-wrap">
+  <div class="mobile-frame">
+    <div class="m-topbar">
+      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px" onclick="if(stepper.get()>1)stepper.back()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="text-align:center"><div class="m-eyebrow" data-i18n="crumb-record">Record Payment</div><h1 id="m-step-title">Select Invoice</h1></div>
+      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+    </div>
+    <div class="m-body">
+      <div class="m-stepper">
+        <div class="m-step active" id="m-sc-1">1</div><div class="m-line" id="m-sl-1"></div>
+        <div class="m-step" id="m-sc-2">2</div><div class="m-line" id="m-sl-2"></div>
+        <div class="m-step" id="m-sc-3">3</div><div class="m-line" id="m-sl-3"></div>
+        <div class="m-step" id="m-sc-4">4</div>
+      </div>
+      <!-- Mobile Step 1 -->
+      <div class="step-panel active" id="m-panel-1">
+        <div style="margin-bottom:12px;font-size:13px;color:var(--text-muted)" data-i18n="step-1-sub">Choose outstanding invoices to pay.</div>
+        <div style="position:relative;margin-bottom:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input class="input" style="padding-left:36px" placeholder="Search customer…"/></div>
+        <div id="m-inv-options"></div>
+      </div>
+      <!-- Mobile Step 2 -->
+      <div class="step-panel" id="m-panel-2">
+        <div class="field"><label data-i18n="lbl-amount">Amount</label>
+          <div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" id="m-pay-amount" value="20.83" inputmode="decimal"/></div>
+        </div>
+        <div class="field"><label data-i18n="lbl-method">Payment Method</label>
+          <div class="seg cols3">
+            <button class="active" data-i18n="method-bank">Bank</button>
+            <button data-i18n="method-cash">Cash</button>
+            <button data-i18n="method-card">Card</button>
+          </div>
+        </div>
+        <div class="field"><label data-i18n="lbl-account">Account</label><select class="select"><option data-i18n="acct-main">Main Bank Account (1002-01)</option><option data-i18n="acct-petty">Petty Cash (1001-01)</option></select></div>
+        <div class="field"><label data-i18n="lbl-date">Date</label><input class="input" type="date" value="2024-01-01"/></div>
+        <div class="field"><label data-i18n="lbl-ref">Reference</label><input class="input" placeholder="BANK-TXN-…"/></div>
+        <div id="m-alloc-items"></div>
+      </div>
+      <!-- Mobile Step 3 -->
+      <div class="step-panel" id="m-panel-3">
+        <div style="background:var(--primary-soft);border:1px solid color-mix(in oklab,var(--primary) 25%,var(--border));border-radius:14px;padding:16px;margin-bottom:14px">
+          <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--primary-ink);font-weight:600;margin-bottom:8px" data-i18n="rev-payment">Payment</div>
+          <div style="font-size:28px;font-weight:700;color:var(--primary-ink);font-variant-numeric:tabular-nums">$20.83</div>
+          <div style="font-size:12.5px;color:var(--primary-ink);opacity:.75;margin-top:4px" data-i18n="method-bank">Bank Transfer · Main Bank Account</div>
+        </div>
+        <div class="summary-box">
+          <div class="s-row"><span class="k" data-i18n="s-invoice-total">Invoice Total</span><span class="v">$92.49</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-previously-paid">Previously Paid</span><span class="v">$50.83</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-this-payment">This Payment</span><span class="v success">$20.83</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-balance-after">Balance After</span><span class="v danger">$20.83</span></div>
+        </div>
+        <div style="background:var(--amber-soft);border-radius:10px;padding:12px;margin-top:12px;font-size:12.5px;color:var(--amber-ink)" data-i18n="review-warning-short">Once confirmed, a journal entry will be posted immediately.</div>
+      </div>
+      <!-- Mobile Step 4 -->
+      <div class="step-panel" id="m-panel-4">
+        <div style="text-align:center;padding:16px 0 24px">
+          <div class="check-circle success-anim"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg></div>
+          <div style="font-size:20px;font-weight:700;margin-bottom:6px" data-i18n="success-title">Payment Recorded!</div>
+          <div style="color:var(--text-muted);font-size:13px" data-i18n="success-sub">Journal entries posted automatically.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,var(--success),color-mix(in oklab,var(--success) 70%,#0ea5e9));border-radius:16px;padding:18px;color:#fff;margin-bottom:14px;text-align:center">
+          <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:8px" data-i18n="badge-posted">Posted</div>
+          <div style="font-size:34px;font-weight:700;font-variant-numeric:tabular-nums">$20.83</div>
+          <div style="opacity:.8;font-size:12.5px;margin-top:4px">INV-2023-007 · Jan 01, 2024</div>
+        </div>
+        <div class="summary-box" style="margin-bottom:14px">
+          <div class="s-row"><span class="k" data-i18n="s-total-paid">Total Paid</span><span class="v success">$71.66</span></div>
+          <div class="s-row"><span class="k" data-i18n="s-remaining">Remaining</span><span class="v danger">$20.83</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <a href="Sale Invoice Details.html" class="btn" style="justify-content:center;font-size:13px" data-i18n="btn-view-invoice">View Invoice</a>
+          <a href="Record Payment.html" class="btn primary" style="justify-content:center;font-size:13px" data-i18n="btn-new-payment">New Payment</a>
+        </div>
+      </div>
+    </div>
+    <div class="mobile-footer" id="m-footer">
+      <button class="btn" id="m-btn-back" onclick="stepper.back()" data-i18n="btn-back">Back</button>
+      <button class="btn primary" id="m-btn-next" onclick="stepper.next()" style="justify-content:center" data-i18n="btn-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shared scripts -->
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/view.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/format.js"></script>
+<script src="assets/js/data-loader.js"></script>
+<script src="assets/js/app-bootstrap.js"></script>
+
+<!-- Components -->
+<script src="components/topbar.js"></script>
+<script src="components/stepper.js"></script>
+
+<!-- Page logic -->
+<script>
+let outstandingInvoices = [];
+let allocations = [];
+let selectedInv = 0;
+let stepper = null;
+
+function renderInvOptions(container) {
+  container.innerHTML = '';
+  outstandingInvoices.forEach((inv, i) => {
+    const el = document.createElement('div');
+    el.className = 'inv-option' + (i === selectedInv ? ' selected' : '');
+    el.onclick = () => { selectedInv = i; renderInvOptions(container); };
+    el.innerHTML = `
+      <div class="check">${i === selectedInv ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>' : ''}</div>
+      <div class="info">
+        <div class="ref">${inv.ref}</div>
+        <div class="cust">${inv.cust}</div>
+        <div class="sub">${inv.sub}</div>
+      </div>
+      <div>
+        <div class="balance">$${inv.balance.toFixed(2)}</div>
+        <div class="badge" style="margin-top:5px;font-size:10.5px">${inv.note}</div>
+      </div>`;
+    container.appendChild(el);
+  });
+}
+
+function renderAllocItems(container) {
+  container.innerHTML = '';
+  allocations.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'alloc-item' + (item.overdue ? ' overdue' : '') + (item.checked ? ' selected' : '');
+    el.innerHTML = `<input type="checkbox" ${item.checked ? 'checked' : ''}/><div class="al"><div class="t">${item.label}</div><div class="s">${item.sub}</div></div><div class="amt">$${item.amount.toFixed(2)}</div>`;
+    container.appendChild(el);
+  });
+}
+
+function setAmt(v) {
+  document.getElementById('pay-amount').value = v;
+  updateSummary();
+}
+
+function updateSummary() {
+  const a = parseFloat(document.getElementById('pay-amount').value) || 0;
+  const r = Math.max(0, 41.66 - a);
+  const formatted = '$' + a.toFixed(2);
+  document.getElementById('s-this').textContent = formatted;
+  document.getElementById('s-after').textContent = '$' + r.toFixed(2);
+  document.getElementById('je-dr').textContent = 'DR ' + formatted;
+  document.getElementById('je-cr').textContent = 'CR ' + formatted;
+  document.getElementById('rev-amount').textContent = formatted;
+  document.getElementById('receipt-amount').textContent = formatted;
+  document.getElementById('receipt-remaining').textContent = '$' + r.toFixed(2);
+  document.getElementById('final-remaining').textContent = '$' + r.toFixed(2);
+}
+
+function updateMobileNavLabels(stepNum) {
+  const footer = document.getElementById('m-footer');
+  const btnBack = document.getElementById('m-btn-back');
+  const btnNext = document.getElementById('m-btn-next');
+  footer.style.display = stepNum === 4 ? 'none' : '';
+  btnBack.style.display = stepNum === 1 ? 'none' : '';
+  btnNext.textContent = stepNum === 3
+    ? AppI18n.t('btn-confirm-post')
+    : AppI18n.t('btn-next');
+}
+
+// Segmented control toggle
+document.addEventListener('click', e => {
+  const t = e.target.closest('.seg button');
+  if (!t) return;
+  t.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+});
+
+AppBootstrap.init({
+  i18n: ['demo-i18n-common', 'demo-i18n-record-payment'],
+  afterReady: () => {
+    AppDataLoader.load('demo-payment-options').then(data => {
+      if (!data) return;
+      outstandingInvoices = data.outstandingInvoices;
+      allocations = data.allocations;
+
+      renderInvOptions(document.getElementById('inv-options'));
+      renderInvOptions(document.getElementById('m-inv-options'));
+      renderAllocItems(document.getElementById('alloc-items'));
+      renderAllocItems(document.getElementById('m-alloc-items'));
+
+      stepper = AppStepper.create({
+        steps: [
+          { id: 1, labelKey: 'step-1' },
+          { id: 2, labelKey: 'step-2' },
+          { id: 3, labelKey: 'step-3' },
+          { id: 4, labelKey: 'step-4' },
+        ],
+        onChange: updateMobileNavLabels,
+      });
+      stepper.go(1);
+
+      AppI18n.apply();
+    });
+  },
+});
+
+AppI18n.onChange(() => { if (stepper) updateMobileNavLabels(stepper.get()); });
+</script>
+<script src="arabic-page-helper.js"></script>
+</body>
+</html>

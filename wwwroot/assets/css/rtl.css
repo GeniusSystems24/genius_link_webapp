@@ -1,0 +1,31 @@
+/* ─── RTL adjustments (Arabic) ─── */
+html[dir="rtl"] .topbar{direction:rtl}
+html[dir="rtl"] .stat-cell .lbl{letter-spacing:0}
+html[dir="rtl"] .crumbs{flex-direction:row-reverse}
+html[dir="rtl"] .card-title::before{margin-right:0;margin-left:8px}
+html[dir="rtl"] .m-card-title::before{margin-right:0;margin-left:8px}
+html[dir="rtl"] .m-eyebrow{letter-spacing:0}
+
+/* containers + grids */
+html[dir="rtl"] .stats-strip,
+html[dir="rtl"] .two-col,
+html[dir="rtl"] .sidebar,
+html[dir="rtl"] .card,
+html[dir="rtl"] .info-row,
+html[dir="rtl"] .act-item{direction:rtl}
+
+/* alignment flips */
+html[dir="rtl"] .info-row .v{text-align:left}
+html[dir="rtl"] .act-icon{flex:none}
+html[dir="rtl"] .q-row{flex-direction:row-reverse}
+html[dir="rtl"] .loyalty-labels{flex-direction:row-reverse}
+html[dir="rtl"] .sc-body,
+html[dir="rtl"] .sc-head{direction:rtl}
+
+/* mobile flips */
+html[dir="rtl"] .m-topbar{direction:rtl}
+html[dir="rtl"] .m-info-row{flex-direction:row-reverse}
+html[dir="rtl"] .mobile-footer{direction:rtl}
+
+/* page header */
+html[dir="rtl"] .page-head{direction:rtl}

@@ -160,6 +160,18 @@ html[dir="rtl"] .tl-body .inst-no{letter-spacing:0}
 .pay-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--success),color-mix(in oklab,var(--success) 70%,#0ea5e9))}
 .pay-labels{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted)}
 
+/* mobile stat grid */
+.m-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.m-stat .lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:4px}
+html[dir="rtl"] .m-stat .lbl{letter-spacing:0}
+.m-stat .val{font-size:20px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.m-stat.success .val{color:var(--success)}
+.m-stat.danger .val{color:var(--danger)}
+.m-stat.primary{background:color-mix(in oklab,var(--primary-soft) 70%,var(--surface))}
+.m-stat.primary .val{color:var(--primary-ink)}
+html[dir="rtl"] .m-stat-grid{direction:rtl}
+
 /* mobile receipt banner (cash) */
 .m-receipt{background:linear-gradient(135deg,var(--success),color-mix(in oklab,var(--success) 65%,#0ea5e9));border-radius:16px;padding:16px;margin-bottom:12px;color:#fff}
 .m-receipt .mr-status{font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.8;font-weight:600;margin-bottom:8px}
@@ -227,12 +239,49 @@ html[dir="rtl"] .tl-body .inst-no{letter-spacing:0}
 .sheet-head h3{margin:0;font-size:17px;font-weight:700}
 .sheet-head .sub{color:var(--text-muted);font-size:12.5px;margin-top:3px}
 .sheet-body{padding:16px 20px;overflow:auto;flex:1}
-.sheet-footer{padding:10px 16px 16px;display:grid;grid-template-columns:1fr 2fr;gap:8px;border-top:1px solid var(--border)}
+.sheet-footer{padding:10px 16px 16px;display:grid;grid-template-columns:1fr 2fr;gap:8px;border-top:1px solid var(--border);background:var(--surface)}
 .input{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font:inherit;font-size:13.5px;transition:border-color .15s,box-shadow .15s;min-height:42px}
 .input:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
 .input::placeholder{color:var(--text-dim)}
 .select{appearance:none;width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font:inherit;font-size:13.5px;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px;background-size:5px 5px;background-repeat:no-repeat;min-height:42px}
 .select:focus{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+
+/* sheet form helpers — Record Payment / Void sheet */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+html[dir="rtl"] .field label{letter-spacing:0;text-align:right}
+
+.big-amount{position:relative}
+.big-amount .cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:700;font-size:17px;color:var(--text-muted);pointer-events:none}
+html[dir="rtl"] .big-amount .cur{left:auto;right:14px}
+.big-amount .input{padding-left:36px;font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;height:56px;border-radius:12px}
+html[dir="rtl"] .big-amount .input{padding-left:12px;padding-right:36px}
+
+.seg{display:grid;gap:6px;background:var(--surface-2);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.seg.two{grid-template-columns:1fr 1fr}
+.seg button{appearance:none;border:0;background:transparent;padding:8px;border-radius:8px;color:var(--text-muted);font:inherit;font-weight:600;font-size:12.5px;cursor:pointer}
+.seg button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+html[dir="rtl"] .seg{direction:rtl}
+
+.alloc-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.alloc-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px}
+.alloc-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;flex:none}
+.alloc-item .ai-body{flex:1;min-width:0}
+.alloc-item .ai-t{font-weight:600;font-size:13.5px}
+.alloc-item .ai-s{color:var(--text-dim);font-size:11.5px;margin-top:2px}
+.alloc-item .ai-r{font-weight:700;font-variant-numeric:tabular-nums}
+.alloc-item.due{border-color:color-mix(in oklab,var(--amber) 35%,var(--border))}
+.alloc-item.overdue{border-color:var(--danger);background:var(--danger-soft)}
+html[dir="rtl"] .alloc-item{flex-direction:row-reverse}
+
+.pay-receipt{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:14px}
+.pay-receipt .r-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.pay-receipt .r-row:last-child{border-bottom:0;font-weight:700}
+.pay-receipt .r-row .rk{color:var(--text-muted)}
+html[dir="rtl"] .pay-receipt .r-row{flex-direction:row-reverse}
+
+.void-warn{background:var(--danger-soft);border:1px solid var(--danger);border-radius:12px;padding:14px 16px;color:var(--danger-ink);font-size:13.5px;line-height:1.6;margin-bottom:14px}
 
 /* RTL */
 html[dir="rtl"] .page-actions{flex-direction:row-reverse}

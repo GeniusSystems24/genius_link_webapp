@@ -9,8 +9,11 @@
     if (item.mono) valClasses.push('mono');
     if (item.valueClass) valClasses.push(item.valueClass);
     const keyAttr = item.keyI18n ? ` data-i18n="${item.keyI18n}"` : '';
+    const keyLabel = item.keyLabel
+      || (item.keyI18n && window.AppI18n ? window.AppI18n.t(item.keyI18n) : '')
+      || '';
     return `<div class="${cls}">
-      <span class="k"${keyAttr}>${item.keyLabel || ''}</span>
+      <span class="k"${keyAttr}>${keyLabel}</span>
       <span class="${valClasses.join(' ')}"${item.valueStyle ? ` style="${item.valueStyle}"` : ''}>${item.value}</span>
     </div>`;
   }

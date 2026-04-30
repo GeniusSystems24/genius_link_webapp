@@ -3,7 +3,7 @@
     installment: 'Sale Invoice Details.html',
     credit: 'Sale Invoice Details.html',
     advance: 'Sale Invoice Details.html',
-    cash: 'Sale Invoice Details - Cash.html',
+    cash: 'Sale Invoice Details.html?type=cash',
     paidCashRefs: new Set(['INV-2023-014', 'INV-2023-031', 'INV-2023-042', 'INV-2023-055']),
   };
 

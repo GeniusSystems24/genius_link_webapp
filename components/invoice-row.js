@@ -7,7 +7,7 @@
 
   function detailsUrl(inv) {
     return inv.type === 'cash'
-      ? 'Sale Invoice Details - Cash.html'
+      ? 'Sale Invoice Details.html?type=cash'
       : 'Sale Invoice Details.html';
   }
 

@@ -1,0 +1,20 @@
+<div class="act-item">
+    <div class="act-icon @Item.Type">@Icon</div>
+    <div class="act-body">
+        <div class="at">@Item.Title</div>
+        <div class="ts">@Item.Timestamp</div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ActivityItem Item { get; set; } = new("created", string.Empty, string.Empty);
+
+    private MarkupString Icon => Item.Type switch
+    {
+        "paid" => UiIcons.Check,
+        "reminder" => UiIcons.Reminder,
+        "print" => UiIcons.Print,
+        "refund" => UiIcons.Refund,
+        _ => UiIcons.File
+    };
+}

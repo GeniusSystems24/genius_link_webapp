@@ -1,0 +1,75 @@
+<div id="@Id" class="sheet @SheetClass">
+    @if (ShowHandle)
+    {
+        <div class="sheet-handle"></div>
+    }
+    <div class="sheet-head">
+        @if (HeaderContent is not null)
+        {
+            @HeaderContent
+        }
+        else
+        {
+            <div>
+                <h3 data-i18n="@TitleI18nKey">@Title</h3>
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <div class="sub" data-i18n="@SubtitleI18nKey">@Subtitle</div>
+                }
+            </div>
+        }
+        @if (ShowCloseButton)
+        {
+            <button class="icon-btn" title="@CloseTitle" @onclick="Close">@CloseIcon</button>
+        }
+    </div>
+    @if (ChildContent is not null)
+    {
+        <div class="sheet-body">
+            @ChildContent
+        </div>
+    }
+    @if (FooterContent is not null)
+    {
+        <div class="sheet-footer @FooterClass">
+            @FooterContent
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public BottomSheets? Host { get; set; }
+
+    [Parameter, EditorRequired] public string Id { get; set; } = string.Empty;
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? TitleI18nKey { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string? SubtitleI18nKey { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? FooterClass { get; set; }
+    [Parameter] public bool ShowHandle { get; set; } = true;
+    [Parameter] public bool ShowCloseButton { get; set; } = true;
+    [Parameter] public string CloseTitle { get; set; } = "Close";
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+
+    private string SheetClass => string.Join(" ", new[] { Host?.IsOpen(Id) == true ? "open" : null, Class }
+        .Where(part => !string.IsNullOrWhiteSpace(part)));
+
+    private static readonly MarkupString CloseIcon = new("<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"><path d=\"M6 6l12 12M6 18L18 6\"/></svg>");
+
+    private async Task Close()
+    {
+        if (OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+
+        if (Host is not null)
+        {
+            await Host.Close();
+        }
+    }
+}

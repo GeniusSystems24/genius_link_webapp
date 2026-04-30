@@ -1,0 +1,15 @@
+<span class="@CssClass" data-i18n="@I18nKey">@DisplayLabel</span>
+
+@code {
+    [Parameter, EditorRequired] public string Type { get; set; } = string.Empty;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? I18nKey { get; set; }
+
+    private string CssClass => $"inv-type {Type}".Trim();
+    private string DisplayLabel => Label ?? Type;
+
+    protected override void OnParametersSet()
+    {
+        I18nKey ??= string.IsNullOrWhiteSpace(Type) ? null : $"type-{Type}";
+    }
+}

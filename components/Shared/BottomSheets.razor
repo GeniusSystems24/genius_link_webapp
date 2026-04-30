@@ -1,0 +1,45 @@
+<CascadingValue Value="this">
+    <div class="sheet-scrim @ScrimClass" @onclick="Close"></div>
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter] public string? ActiveSheetId { get; set; }
+    [Parameter] public EventCallback<string?> ActiveSheetIdChanged { get; set; }
+    [Parameter] public EventCallback<string?> OnSheetChanged { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string? InternalActiveSheetId { get; set; }
+    private string? CurrentSheetId => ActiveSheetId ?? InternalActiveSheetId;
+    private string ScrimClass => string.IsNullOrWhiteSpace(CurrentSheetId) ? string.Empty : "open";
+
+    public bool IsOpen(string sheetId)
+    {
+        return string.Equals(CurrentSheetId, sheetId, StringComparison.Ordinal);
+    }
+
+    public Task Open(string sheetId)
+    {
+        return SetActiveSheet(sheetId);
+    }
+
+    public Task Close()
+    {
+        return SetActiveSheet(null);
+    }
+
+    private async Task SetActiveSheet(string? sheetId)
+    {
+        if (!ActiveSheetIdChanged.HasDelegate)
+        {
+            InternalActiveSheetId = sheetId;
+        }
+
+        if (ActiveSheetIdChanged.HasDelegate)
+        {
+            await ActiveSheetIdChanged.InvokeAsync(sheetId);
+        }
+
+        await OnSheetChanged.InvokeAsync(sheetId);
+    }
+}

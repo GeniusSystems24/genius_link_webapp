@@ -1,0 +1,25 @@
+<div class="@CssClass">
+    @foreach (var stat in Items)
+    {
+        <div class="@CellClass(stat)">
+            <div class="lbl" data-i18n="@stat.LabelKey">@stat.Label</div>
+            <div class="val">@stat.Value</div>
+            @if (!string.IsNullOrWhiteSpace(stat.Sub) || !string.IsNullOrWhiteSpace(stat.SubKey))
+            {
+                <div class="sub" data-i18n="@stat.SubKey">@stat.Sub</div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<StatItem> Items { get; set; } = [];
+    [Parameter] public string? Class { get; set; }
+
+    private string CssClass => string.Join(" ", new[] { "stats-strip", Class }.Where(v => !string.IsNullOrWhiteSpace(v)));
+
+    private static string CellClass(StatItem stat)
+    {
+        return string.IsNullOrWhiteSpace(stat.Tone) ? "stat-cell" : $"stat-cell {stat.Tone}";
+    }
+}

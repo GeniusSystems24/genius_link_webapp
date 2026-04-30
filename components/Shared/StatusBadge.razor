@@ -1,0 +1,19 @@
+<span class="@CssClass" style="@Style" data-i18n="@I18nKey">
+    <span class="dot"></span>@DisplayLabel
+</span>
+
+@code {
+    [Parameter, EditorRequired] public string Status { get; set; } = string.Empty;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool Small { get; set; }
+    [Parameter] public string? I18nKey { get; set; }
+
+    private string CssClass => $"status-badge {Status}".Trim();
+    private string? Style => Small ? "font-size:10.5px" : null;
+    private string DisplayLabel => Label ?? Status;
+
+    protected override void OnParametersSet()
+    {
+        I18nKey ??= string.IsNullOrWhiteSpace(Status) ? null : $"status-{Status}";
+    }
+}

@@ -1,21 +1,18 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sale Invoice Details</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/app.css">
-<link rel="stylesheet" href="assets/css/sale-invoice-details.css">
-</head>
-<body data-view="desktop">
+@page "/sale-invoice-details"
 
-<!-- Topbar (rendered by components/topbar.js) -->
+<PageTitle>Sale Invoice Details</PageTitle>
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/app.css" />
+    <link rel="stylesheet" href="assets/css/sale-invoice-details.css" />
+</HeadContent>
+
+<!-- Topbar -->
 <div data-component="topbar"
-     data-brand-href="Invoice List.html"
-     data-crumbs='[{"label":"Invoices","href":"Invoice List.html","key":"nav-invoices"},{"label":"INV-2023-007"}]'></div>
+     data-brand-href="/invoice-list"
+     data-crumbs='[{"label":"Invoices","href":"/invoice-list","key":"nav-invoices"},{"label":"INV-2023-007"}]'></div>
 
 <!-- =================== DESKTOP =================== -->
 <div class="desktop-wrap">
@@ -88,11 +85,11 @@
                 <div class="name" id="cust-name">Alex Thompson</div>
                 <div class="sub" id="cust-sub">Customer #F-062 · Retail since 2021</div>
                 <div class="tags">
-                  <span class="pill neutral" id="cust-email">alex@email.com</span>
+                  <span class="pill neutral" id="cust-email">alex@@email.com</span>
                   <span class="pill neutral" id="cust-phone">+1 555 010 2233</span>
                 </div>
               </div>
-              <a href="Customer Profile.html" class="icon-btn" style="margin-left:auto" title="View customer">
+              <a href="/customer-profile" class="icon-btn" style="margin-left:auto" title="View customer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </a>
             </div>
@@ -446,7 +443,7 @@
     <div class="sub">Send a copy to the customer</div>
   </div>
   <div class="sheet-body">
-    <div class="s-field"><label data-i18n="lbl-recipient-email">Recipient Email</label><input class="input" id="email-receipt-to" value="daniel@email.com" type="email"/></div>
+    <div class="s-field"><label data-i18n="lbl-recipient-email">Recipient Email</label><input class="input" id="email-receipt-to" value="daniel@@email.com" type="email"/></div>
     <div class="s-field"><label data-i18n="lbl-subject">Subject</label><input class="input" id="email-receipt-subject" value="Your receipt from Ledgerly - INV-2023-014"/></div>
     <div class="s-field"><label data-i18n="lbl-message">Message (optional)</label><textarea class="input" placeholder="Add a personal message..." style="min-height:80px;resize:vertical"></textarea></div>
     <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text-muted)">
@@ -494,26 +491,12 @@
   </div>
 </div>
 
-<!-- Shared scripts: theme, view, i18n, format, data loader -->
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/view.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/format.js"></script>
 <script src="assets/js/data-loader.js"></script>
 <script src="assets/js/app-bootstrap.js"></script>
-
-<!-- Components -->
-<script src="components/topbar.js"></script>
-<script src="components/status-badge.js"></script>
-<script src="components/inv-type-pill.js"></script>
-<script src="components/info-rows.js"></script>
-<script src="components/products-table.js"></script>
-<script src="components/installment-timeline.js"></script>
-<script src="components/journal-entries.js"></script>
-<script src="components/activity-log.js"></script>
-
-<!-- Page logic -->
+<script src="assets/js/components.js"></script>
 <script src="assets/js/sale-invoice-details.js"></script>
 <script src="arabic-page-helper.js"></script>
-</body>
-</html>

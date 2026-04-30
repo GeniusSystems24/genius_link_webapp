@@ -1,0 +1,78 @@
+@if (Mobile)
+{
+    <div class="m-steps">
+        @for (var index = 0; index < Steps.Count; index++)
+        {
+            var step = Steps[index];
+            var number = index + 1;
+            <button id="m-sc-@number" class="@MobileStepClass(number)" @onclick="() => SetStep(number)">@StepContent(number)</button>
+            @if (number < Steps.Count)
+            {
+                <div id="m-sl-@number" class="@MobileLineClass(number)"></div>
+            }
+        }
+    </div>
+    @if (CurrentStep > 0 && CurrentStep <= Steps.Count)
+    {
+        var step = Steps[CurrentStep - 1];
+        <div id="m-step-title" data-i18n="@step.LabelKey">@(step.Label ?? step.LabelKey)</div>
+    }
+}
+else
+{
+    <div class="steps">
+        @for (var index = 0; index < Steps.Count; index++)
+        {
+            var step = Steps[index];
+            var number = index + 1;
+            <div class="step-wrap">
+                <button id="sc-@number" class="@StepClass(number)" @onclick="() => SetStep(number)">@StepContent(number)</button>
+                <div class="@StepLabelClass(number)" data-i18n="@step.LabelKey">@(step.Label ?? step.LabelKey)</div>
+            </div>
+            @if (number < Steps.Count)
+            {
+                <div id="sl-@number" class="@StepLineClass(number)"></div>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<StepperStep> Steps { get; set; } = [];
+    [Parameter] public int CurrentStep { get; set; } = 1;
+    [Parameter] public bool Mobile { get; set; }
+    [Parameter] public EventCallback<int> CurrentStepChanged { get; set; }
+
+    private async Task SetStep(int step)
+    {
+        CurrentStep = Math.Clamp(step, 1, Math.Max(1, Steps.Count));
+        await CurrentStepChanged.InvokeAsync(CurrentStep);
+    }
+
+    private RenderFragment StepContent(int number) => builder =>
+    {
+        if (number < CurrentStep)
+        {
+            builder.AddContent(0, UiIcons.Check);
+            return;
+        }
+
+        builder.AddContent(1, number);
+    };
+
+    private string StepClass(int number) => StateClass("step-circle", number);
+    private string MobileStepClass(int number) => StateClass("m-step", number);
+    private string StepLabelClass(int number) => StateClass("step-label", number);
+    private string StepLineClass(int number) => number < CurrentStep ? "step-line done" : "step-line";
+    private string MobileLineClass(int number) => number < CurrentStep ? "m-line done" : "m-line";
+
+    private string StateClass(string baseClass, int number)
+    {
+        if (number < CurrentStep)
+        {
+            return $"{baseClass} done";
+        }
+
+        return number == CurrentStep ? $"{baseClass} active" : baseClass;
+    }
+}

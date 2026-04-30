@@ -7,7 +7,17 @@
     <title>Genius Link Web App</title>
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
-<body>
+<body data-view="desktop" data-enhance-nav="false">
+    <script>
+        window.GeniusRoutes = {
+            invoiceList: '/invoice-list',
+            createSaleInvoice: '/create-sale-invoice',
+            customerProfile: '/customer-profile',
+            recordPayment: '/record-payment',
+            saleInvoiceDetails: '/sale-invoice-details',
+            saleInvoiceDetailsCash: '/sale-invoice-details-cash'
+        };
+    </script>
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
 </body>

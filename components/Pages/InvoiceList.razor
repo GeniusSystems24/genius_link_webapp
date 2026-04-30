@@ -1,19 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Invoice List</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/app.css">
-<link rel="stylesheet" href="assets/css/invoice-list.css">
-</head>
-<body data-view="desktop">
+@page "/invoice-list"
 
-<!-- Topbar (rendered by components/topbar.js) -->
+<PageTitle>Invoice List</PageTitle>
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/app.css" />
+    <link rel="stylesheet" href="assets/css/invoice-list.css" />
+</HeadContent>
+
+<!-- Topbar -->
 <div data-component="topbar"
-     data-brand-href="Create Sale Invoice.html"
+     data-brand-href="/create-sale-invoice"
      data-crumbs='[{"label":"Invoices","key":"nav-invoices"}]'></div>
 
 <!-- =================== DESKTOP =================== -->
@@ -26,11 +24,11 @@
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn" onclick="openSheet('sheet-filter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span data-i18n="btn-filter">Filters</span></button>
-      <a href="Create Sale Invoice.html" class="btn primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-invoice">New Invoice</span></a>
+      <a href="/create-sale-invoice" class="btn primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-invoice">New Invoice</span></a>
     </div>
   </div>
 
-  <!-- Stats strip (rendered by components/stats-strip.js) -->
+  <!-- Stats strip -->
   <div id="invoice-stats"></div>
 
   <!-- Filters -->
@@ -84,7 +82,7 @@
     <div class="m-topbar">
       <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <div style="text-align:center"><div class="m-eyebrow" data-i18n="nav-invoices">Invoices</div><h1 data-i18n="page-title">Sale Invoices</h1></div>
-      <a href="Create Sale Invoice.html" style="appearance:none;border:0;background:var(--primary);color:#fff;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;cursor:pointer;text-decoration:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></a>
+      <a href="/create-sale-invoice" style="appearance:none;border:0;background:var(--primary);color:#fff;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;cursor:pointer;text-decoration:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></a>
     </div>
     <div class="m-body">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
@@ -123,104 +121,12 @@
   <div class="sheet-footer"><button class="btn" onclick="closeSheets()" data-i18n="btn-reset">Reset</button><button class="btn primary" style="justify-content:center" onclick="closeSheets()" data-i18n="btn-apply-filters">Apply Filters</button></div>
 </div>
 
-<!-- Shared scripts: theme, view, i18n, format, data loader -->
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/view.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/format.js"></script>
 <script src="assets/js/data-loader.js"></script>
 <script src="assets/js/app-bootstrap.js"></script>
-
-<!-- Components -->
-<script src="components/topbar.js"></script>
-<script src="components/status-badge.js"></script>
-<script src="components/inv-type-pill.js"></script>
-<script src="components/invoice-row.js"></script>
-<script src="components/stats-strip.js"></script>
-
-<!-- Page logic -->
-<script>
-let invoices = [];
-let activeFilter = 'all';
-let searchQuery = '';
-
-function renderRows() {
-  const list = document.getElementById('invoice-rows');
-  const mc = document.getElementById('m-invoice-cards');
-  const filtered = invoices.filter(inv => {
-    if (activeFilter !== 'all' && inv.status !== activeFilter) return false;
-    if (searchQuery && !inv.ref.toLowerCase().includes(searchQuery) && !inv.cust.toLowerCase().includes(searchQuery)) return false;
-    return true;
-  });
-
-  list.innerHTML = '';
-  filtered.forEach(inv => {
-    const row = document.createElement('div');
-    row.className = 'inv-row';
-    row.onclick = () => { window.location.href = AppInvoiceRow.detailsUrl(inv); };
-    row.innerHTML = AppInvoiceRow.tableRowHtml(inv);
-    list.appendChild(row);
-  });
-  document.getElementById('pag-info').textContent = `Showing 1–${filtered.length} of 248`;
-
-  mc.innerHTML = '';
-  filtered.forEach(inv => {
-    const card = document.createElement('div');
-    card.className = 'm-inv-card';
-    card.onclick = () => { window.location.href = AppInvoiceRow.detailsUrl(inv); };
-    card.innerHTML = AppInvoiceRow.mobileCardHtml(inv);
-    mc.appendChild(card);
-  });
-}
-
-function setFilter(f) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c => c.style.opacity = '0.5');
-  const chip = document.getElementById('chip-' + f);
-  if (chip) chip.style.opacity = '1';
-  renderRows();
-}
-
-function filterRows() {
-  searchQuery = document.getElementById('search-input').value.toLowerCase();
-  renderRows();
-}
-
-function openSheet(id) {
-  document.getElementById('scrim').classList.add('open');
-  document.getElementById(id).classList.add('open');
-}
-
-function closeSheets() {
-  document.getElementById('scrim').classList.remove('open');
-  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
-}
-
-function buildStats(summary) {
-  return [
-    { tone: '',        labelKey: 'stat-total',       value: summary.totalCount,         subKey: 'stat-total-sub'       },
-    { tone: 'success', labelKey: 'stat-revenue',     value: summary.revenue,            subKey: 'stat-revenue-sub'     },
-    { tone: 'primary', labelKey: 'stat-outstanding', value: summary.outstanding,        subKey: 'stat-outstanding-sub' },
-    { tone: 'danger',  labelKey: 'stat-overdue',     value: summary.overdue,            subKey: 'stat-overdue-sub'     },
-  ];
-}
-
-AppBootstrap.init({
-  i18n: ['demo-i18n-common', 'demo-i18n-invoice-list'],
-  afterReady: () => {
-    AppDataLoader.load('demo-invoices').then(data => {
-      if (!data) return;
-      invoices = data.list;
-      AppStatsStrip.render(document.getElementById('invoice-stats'), buildStats(data.summary));
-      AppI18n.apply();
-      renderRows();
-    });
-  },
-});
-
-// Re-render rows whenever language changes (status / type labels are localised).
-AppI18n.onChange(() => { if (invoices.length) renderRows(); });
-</script>
+<script src="assets/js/components.js"></script>
+<script src="assets/js/invoice-list.js"></script>
 <script src="arabic-page-helper.js"></script>
-</body>
-</html>

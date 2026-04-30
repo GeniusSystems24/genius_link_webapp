@@ -1,0 +1,503 @@
+@page "/sale-invoice-details-cash"
+@page "/sale-invoice-details/cash"
+
+<PageTitle>Sale Invoice Details - Cash</PageTitle>
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/app.css" />
+    <link rel="stylesheet" href="assets/css/sale-invoice-details.css" />
+</HeadContent>
+
+<!-- Topbar -->
+<div data-component="topbar"
+     data-brand-href="/invoice-list"
+     data-crumbs='[{"label":"Invoices","href":"/invoice-list","key":"nav-invoices"},{"label":"INV-2023-007"}]'></div>
+
+<!-- =================== DESKTOP =================== -->
+<div class="desktop-wrap">
+<main class="page">
+
+  <!-- Page header -->
+  <div class="page-head">
+    <div>
+      <div class="meta" style="margin:0 0 8px">
+        <span class="status partial" id="invoice-status"><span class="dot"></span><span data-i18n="status-partial">Partially Paid</span></span>
+        <span class="pill neutral mono" id="inv-ref-pill">INV-2023-007</span>
+        <span class="pill purple" data-i18n="pill-installment">Installment · 3×</span>
+      </div>
+      <h1 id="inv-title">Sale Invoice — Alex Thompson</h1>
+      <div class="meta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-dim)"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        <span style="color:var(--text-muted);font-size:13px" id="inv-date-meta">
+          <span data-i18n="lbl-posted">Posted</span>
+          <strong style="color:var(--text)" id="inv-posted">Nov 01, 2023</strong>
+          &nbsp;·&nbsp;
+          <span data-i18n="lbl-due">Due</span>
+          <strong style="color:var(--amber)" id="inv-due-range">Dec 01 – Feb 01, 2024</strong>
+        </span>
+        <span class="pill amber" id="paid-ratio">1 / 3 paid</span>
+      </div>
+    </div>
+    <div class="page-actions" id="page-actions"></div>
+  </div>
+
+  <!-- Receipt banner (cash variant) -->
+  <div class="receipt-banner" id="receipt-banner" hidden></div>
+
+  <!-- Summary strip -->
+  <div class="summary-strip" id="summary-strip"></div>
+
+  <!-- Payment progress -->
+  <div class="card" id="payment-progress-card">
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-weight:600;font-size:13.5px"><span data-i18n="lbl-pay-progress">Payment Progress</span></div>
+        <div style="font-size:13px;color:var(--text-muted)">
+          <strong style="color:var(--text)" id="pay-collected">$50.83</strong>
+          <span data-i18n="lbl-of">of</span>
+          <span id="pay-total">$92.49</span>
+          <span data-i18n="lbl-collected">collected</span>
+        </div>
+      </div>
+      <div class="pay-track"><div class="pay-fill" id="pay-fill" style="width:55%"></div></div>
+      <div class="pay-labels"><span>0%</span><span style="color:var(--success);font-weight:600" id="pay-pct">55% paid</span><span>100%</span></div>
+    </div>
+  </div>
+
+  <!-- Main two-column -->
+  <div class="two-col">
+
+    <!-- Left column -->
+    <div>
+
+      <!-- Invoice details -->
+      <div class="card">
+        <div class="card-head"><div class="card-title" data-i18n="card-inv-details">Invoice Details</div></div>
+        <div class="card-body">
+          <div class="info-grid" id="inv-details-grid"></div>
+
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+            <div class="k" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px" data-i18n="k-customer">Customer</div>
+            <div class="cust-card">
+              <div class="cust-avatar" id="cust-initial">A</div>
+              <div class="cust-info">
+                <div class="name" id="cust-name">Alex Thompson</div>
+                <div class="sub" id="cust-sub">Customer #F-062 · Retail since 2021</div>
+                <div class="tags">
+                  <span class="pill neutral" id="cust-email">alex@@email.com</span>
+                  <span class="pill neutral" id="cust-phone">+1 555 010 2233</span>
+                </div>
+              </div>
+              <a href="/customer-profile" class="icon-btn" style="margin-left:auto" title="View customer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title" data-i18n="card-products">Products</div>
+          <div class="pill neutral"><span id="prod-count">2</span> <span data-i18n="lbl-lines">lines</span></div>
+        </div>
+        <div class="card-body" style="padding:8px 0 0">
+          <div class="pthead">
+            <div data-i18n="th-product2">Product</div>
+            <div data-i18n="th-qty">Qty</div>
+            <div data-i18n="th-price">Unit Price</div>
+            <div data-i18n="th-discount">Discount</div>
+            <div style="text-align:right" data-i18n="th-total">Line Total</div>
+          </div>
+          <div id="products-rows"></div>
+          <div style="padding:10px 14px;background:var(--surface-2);display:flex;justify-content:flex-end;gap:8px;align-items:center">
+            <span style="font-size:12px;color:var(--text-muted)" data-i18n="lbl-prod-subtotal">Product Subtotal</span>
+            <span style="font-weight:700;font-size:15px;font-variant-numeric:tabular-nums" id="prod-subtotal">$39.99</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional costs -->
+      <div class="card">
+        <div class="card-head"><div class="card-title" data-i18n="card-costs">Additional Costs &amp; Discounts</div></div>
+        <div class="card-body" style="padding:8px 0 0" id="costs-rows"></div>
+      </div>
+
+      <!-- Installment Timeline -->
+      <div class="card" id="installment-card">
+        <div class="card-head">
+          <div>
+            <div class="card-title" data-i18n="card-plan-sched">Installment Payment Schedule</div>
+            <div class="card-sub" data-i18n="card-plan-sched-sub">3 installments · Monthly · Down payment recorded</div>
+          </div>
+          <div style="display:flex;gap:6px" id="plan-badges"></div>
+        </div>
+        <div class="card-body" id="installments"></div>
+      </div>
+
+      <!-- Cash Payment Record -->
+      <div class="card" id="cash-payment-card" hidden></div>
+
+      <!-- Journal Entries -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title" data-i18n="card-journal">Journal Entries</div>
+          <div class="pill neutral" data-i18n="pill-auto-generated">Auto-generated</div>
+        </div>
+        <div class="card-body" style="padding:8px 0 0">
+          <table class="je-table">
+            <thead>
+              <tr>
+                <th data-i18n="th-account">Account</th>
+                <th data-i18n="th-description">Description</th>
+                <th style="text-align:right" data-i18n="th-debit">Debit (DR)</th>
+                <th style="text-align:right" data-i18n="th-credit">Credit (CR)</th>
+              </tr>
+            </thead>
+            <tbody id="journal-rows"></tbody>
+          </table>
+          <div style="padding:10px 14px;font-size:12px;color:var(--text-dim)" id="journal-note" data-i18n="je-empty-note">Installment payments will post additional DR Cash / CR A/R entries as each is recorded.</div>
+        </div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="card">
+        <div class="card-head"><div class="card-title" data-i18n="card-activity">Activity Log</div></div>
+        <div class="card-body" id="activity-list"></div>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="sidebar">
+      <div class="action-card">
+        <div class="a-body">
+          <div class="a-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+            <span data-i18n="sidebar-inv-totals">Invoice Totals</span>
+          </div>
+          <div class="totals-stack" id="totals-stack"></div>
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="a-body">
+          <div class="a-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <span id="payment-summary-title" data-i18n="sidebar-pay-summary">Payment Summary</span>
+          </div>
+          <div id="pay-summary-rows"></div>
+          <div id="payment-summary-footer">
+            <div class="trow-divider" style="margin:8px 0"></div>
+            <div class="quick-stat"><span class="qk" style="font-weight:700;color:var(--text)" data-i18n="lbl-total-collected">Total Collected</span><span class="qv" style="color:var(--success);font-size:16px" id="total-collected">$50.83</span></div>
+            <div class="quick-stat"><span class="qk" style="font-weight:700;color:var(--text)" data-i18n="lbl-remaining">Remaining</span><span class="qv" style="color:var(--danger);font-size:16px" id="remaining">$41.66</span></div>
+          </div>
+          <div style="margin-top:12px" id="payment-summary-action">
+            <button class="btn primary" style="width:100%;justify-content:center" onclick="openSheet('sheet-pay')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
+              <span data-i18n="btn-record-payment">Record Payment</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="a-body">
+          <div class="a-title" data-i18n="card-quick-actions">Quick Actions</div>
+          <div class="a-row" id="quick-actions"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /two-col -->
+</main>
+</div><!-- /desktop-wrap -->
+
+<!-- =================== MOBILE =================== -->
+<div class="mobile-wrap">
+  <div class="mobile-frame">
+    <div class="m-topbar">
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="text-align:center">
+        <div class="m-eyebrow" data-i18n="m-sale-invoice">Sale Invoice</div>
+        <h1 id="inv-ref-pill-mobile">INV-2023-007</h1>
+      </div>
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+    </div>
+
+    <div class="m-body">
+      <!-- Receipt banner mobile (cash variant) -->
+      <div class="m-receipt" id="m-receipt-banner" hidden></div>
+
+      <!-- Status + Summary -->
+      <div class="m-card" id="m-status-summary-card">
+        <div class="m-card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:.1em;text-transform:uppercase" id="m-customer-name">Alex Thompson</div>
+              <div style="font-weight:700;font-size:16px;margin-top:3px;letter-spacing:-.01em" id="m-sale-label" data-i18n="m-sale-invoice">Sale Invoice</div>
+            </div>
+            <span class="status partial" id="m-invoice-status"><span class="dot"></span><span data-i18n="status-partial">Partially Paid</span></span>
+          </div>
+          <div class="m-stat-grid" id="m-summary-grid"></div>
+          <div class="pay-track" style="margin-top:12px"><div class="pay-fill" id="m-pay-fill" style="width:55%"></div></div>
+          <div class="pay-labels"><span>0%</span><span style="color:var(--success);font-weight:600" id="m-pay-pct">55% paid</span><span>100%</span></div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="card-inv-details">Invoice Details</div></div>
+        <div class="m-card-body" id="m-inv-info"></div>
+      </div>
+
+      <!-- Customer -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="k-customer">Customer</div></div>
+        <div class="m-card-body" id="m-customer-info"></div>
+      </div>
+
+      <!-- Products -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="card-products">Products</div><span class="pill neutral"><span id="m-prod-count">2</span> <span data-i18n="lbl-items">items</span></span></div>
+        <div class="m-card-body" id="m-products-rows"></div>
+      </div>
+
+      <!-- Additional costs -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="card-costs">Additional Costs &amp; Discounts</div></div>
+        <div class="m-card-body" id="m-costs-rows"></div>
+      </div>
+
+      <!-- Totals -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="m-inv-summary">Invoice Summary</div></div>
+        <div class="m-card-body" id="m-totals-rows"></div>
+      </div>
+
+      <!-- Installment timeline -->
+      <div class="m-card" id="m-installment-card">
+        <div class="m-card-head">
+          <div class="m-card-title" data-i18n="card-pay-sched">Payment Schedule</div>
+          <div style="display:flex;gap:4px" id="m-plan-badges"></div>
+        </div>
+        <div class="m-card-body" id="m-installments"></div>
+      </div>
+
+      <!-- Cash payment record -->
+      <div class="m-card" id="m-cash-payment-card" hidden></div>
+
+      <!-- Journal Entries -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="card-journal">Journal Entries</div><span class="pill neutral" data-i18n="pill-auto-generated">Auto-generated</span></div>
+        <div class="m-card-body">
+          <div class="m-je-list" id="m-journal-rows"></div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.45;margin-top:10px" id="m-journal-note" data-i18n="je-empty-note">Installment payments will post additional DR Cash / CR A/R entries as each is recorded.</div>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="card-activity">Activity Log</div></div>
+        <div class="m-card-body" id="m-activity-list"></div>
+      </div>
+
+      <!-- Payment Summary -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" id="m-pay-summary-title" data-i18n="sidebar-pay-summary">Payment Summary</div></div>
+        <div class="m-card-body" id="m-pay-summary"></div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="m-card">
+        <div class="m-card-head"><div class="m-card-title" data-i18n="card-quick-actions">Quick Actions</div></div>
+        <div class="m-card-body">
+          <div class="m-action-stack" id="m-quick-actions"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mobile-footer" id="mobile-footer-actions"></div>
+  </div>
+</div>
+
+<!-- =================== SHEETS =================== -->
+<div class="sheet-scrim" id="scrim" onclick="closeSheets()"></div>
+
+<!-- Record Payment Sheet -->
+<div class="sheet" id="sheet-pay">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h3 data-i18n="sheet-pay-title">Record Payment</h3>
+    <div class="sub">INV-2023-007 · Alex Thompson · <span data-i18n="lbl-balance-remaining">Balance</span> $41.66</div>
+  </div>
+  <div class="sheet-body">
+    <div class="field">
+      <label data-i18n="lbl-amt-received">Amount Received</label>
+      <div class="big-amount"><span class="cur">$</span><input class="input" id="pay-amount" value="20.83" inputmode="decimal" oninput="updateReceipt()"/></div>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl-pay-method">Payment Method</label>
+      <div class="seg two">
+        <button class="active" data-v="bank" data-i18n="method-bank">Bank Transfer</button>
+        <button data-v="cash" data-i18n="method-cash">Cash</button>
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl-cash-bank-acct">Cash / Bank Account</label>
+      <select class="select">
+        <option>Main Bank Account (1002-01)</option>
+        <option>Petty Cash (1001-01)</option>
+        <option>Merchant Operating (Chase)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl-pay-date">Payment Date</label>
+      <input class="input" value="Jan 01, 2024" type="text"/>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl-allocate">Allocate to Installments</label>
+      <div class="alloc-list">
+        <div class="alloc-item due">
+          <input type="checkbox" checked/>
+          <div class="ai-body"><div class="ai-t">Installment #2</div><div class="ai-s">Due Jan 01, 2024</div></div>
+          <div class="ai-r">$20.83</div>
+        </div>
+        <div class="alloc-item">
+          <input type="checkbox"/>
+          <div class="ai-body"><div class="ai-t">Installment #3</div><div class="ai-s">Due Feb 01, 2024</div></div>
+          <div class="ai-r">$20.83</div>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl-ref-notes">Reference / Notes</label>
+      <input class="input" data-i18n-ph="ph-pay-ref" placeholder="e.g. Bank ref #, receipt number…"/>
+    </div>
+    <div class="pay-receipt">
+      <div class="r-row"><span class="rk" data-i18n="r-prev-balance">Previous balance</span><span id="r-prev">$41.66</span></div>
+      <div class="r-row"><span class="rk" data-i18n="r-amt-paid">Amount paid now</span><span id="r-paid">$20.83</span></div>
+      <div class="r-row"><span class="rk" data-i18n="r-balance-after">Balance after payment</span><span id="r-remain" style="color:var(--amber)">$20.83</span></div>
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn" onclick="closeSheets()" data-i18n="btn-cancel">Cancel</button>
+    <button class="btn primary" style="justify-content:center" onclick="confirmPayment()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
+      <span data-i18n="btn-confirm-payment">Confirm Payment</span>
+    </button>
+  </div>
+</div>
+
+<!-- Refund Sheet (cash variant) -->
+<div class="sheet" id="sheet-refund">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h3 data-i18n="sheet-refund-title">Process Refund</h3>
+    <div class="sub" id="refund-sheet-sub">INV-2023-014 - Daniel Park - Paid $57.49 cash</div>
+  </div>
+  <div class="sheet-body">
+    <div class="s-field">
+      <label>Refund Type</label>
+      <div class="seg two" id="refund-type">
+        <button class="active" data-v="full" onclick="setRefundType('full')">Full Refund</button>
+        <button data-v="partial" onclick="setRefundType('partial')">Partial Refund</button>
+      </div>
+    </div>
+    <div class="s-field" id="partial-field" style="display:none">
+      <label>Refund Amount</label>
+      <input class="input mono" id="refund-amt" value="57.49" inputmode="decimal" oninput="updateRefundPreview()"/>
+    </div>
+    <div class="s-field">
+      <label data-i18n="lbl-refund-method">Refund Method</label>
+      <select class="select"><option>Cash (same method)</option><option>Store Credit</option><option>Bank Transfer</option></select>
+    </div>
+    <div class="s-field">
+      <label data-i18n="lbl-reason">Reason</label>
+      <select class="select"><option>Customer dissatisfied</option><option>Wrong item delivered</option><option>Duplicate transaction</option><option>Other</option></select>
+    </div>
+    <div class="s-field">
+      <label data-i18n="lbl-notes">Notes</label>
+      <input class="input" placeholder="Optional details..."/>
+    </div>
+    <div class="refund-preview" id="refund-preview">
+      <div class="r-row"><span class="rk" data-i18n="lbl-inv-total">Invoice Total</span><span id="rp-total">$57.49</span></div>
+      <div class="r-row"><span class="rk">Refund Amount</span><span id="rp-amt" style="color:var(--danger)">-$57.49</span></div>
+      <div class="r-row"><span class="rk">Customer receives</span><span id="rp-cash" style="color:var(--danger-ink);font-weight:700">$57.49 cash</span></div>
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn" onclick="closeSheets()" data-i18n="btn-cancel">Cancel</button>
+    <button class="btn danger" style="justify-content:center" onclick="confirmRefund()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 009 9 9 9 0 009-9 9 9 0 00-9-9M3 12l3-3m-3 3l3 3"/></svg>
+      <span>Confirm Refund</span>
+    </button>
+  </div>
+</div>
+
+<!-- Email Receipt Sheet (cash variant) -->
+<div class="sheet" id="sheet-email">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h3 data-i18n="sheet-email-title">Email Receipt</h3>
+    <div class="sub">Send a copy to the customer</div>
+  </div>
+  <div class="sheet-body">
+    <div class="s-field"><label data-i18n="lbl-recipient-email">Recipient Email</label><input class="input" id="email-receipt-to" value="daniel@@email.com" type="email"/></div>
+    <div class="s-field"><label data-i18n="lbl-subject">Subject</label><input class="input" id="email-receipt-subject" value="Your receipt from Ledgerly - INV-2023-014"/></div>
+    <div class="s-field"><label data-i18n="lbl-message">Message (optional)</label><textarea class="input" placeholder="Add a personal message..." style="min-height:80px;resize:vertical"></textarea></div>
+    <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text-muted)">
+      A PDF receipt will be attached automatically.
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn" onclick="closeSheets()" data-i18n="btn-cancel">Cancel</button>
+    <button class="btn primary" style="justify-content:center" onclick="closeSheets()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <span>Send Receipt</span>
+    </button>
+  </div>
+</div>
+
+<!-- Void confirmation -->
+<div class="sheet" id="sheet-void">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h3 data-i18n="sheet-void-title">Void Invoice</h3>
+    <div class="sub" data-i18n="sub-void-warn">This action cannot be undone</div>
+  </div>
+  <div class="sheet-body">
+    <div class="void-warn" data-i18n="void-warning"><strong>Warning:</strong> Voiding this invoice will reverse all associated journal entries. Payments already recorded will need to be manually reconciled. Any installments will be cancelled.</div>
+    <div class="field">
+      <label data-i18n="lbl-void-reason">Void Reason</label>
+      <select class="select">
+        <option data-i18n="void-reason-cancel">Customer cancelled order</option>
+        <option data-i18n="void-reason-dup">Duplicate invoice</option>
+        <option data-i18n="void-reason-pricing">Pricing error</option>
+        <option data-i18n="void-reason-other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl-notes">Notes</label>
+      <input class="input" data-i18n-ph="ph-void-notes" placeholder="Optional details…"/>
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn" onclick="closeSheets()" data-i18n="btn-keep-invoice">Keep Invoice</button>
+    <button class="btn danger" style="justify-content:center" onclick="closeSheets()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>
+      <span data-i18n="sheet-void-title">Void Invoice</span>
+    </button>
+  </div>
+</div>
+
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/view.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/format.js"></script>
+<script src="assets/js/data-loader.js"></script>
+<script src="assets/js/app-bootstrap.js"></script>
+<script src="assets/js/components.js"></script>
+<script src="assets/js/sale-invoice-details.js"></script>
+<script src="arabic-page-helper.js"></script>

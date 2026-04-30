@@ -1,0 +1,144 @@
+@if (DownPayment is not null && !Mobile)
+{
+    <div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="width:40px;display:flex;flex-direction:column;align-items:center">
+            <div class="tl-dot paid" style="width:32px;height:32px">@UiIcons.Check</div>
+        </div>
+        <div style="flex:1">
+            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:3px" data-i18n="lbl-dp">Down Payment</div>
+            <div style="font-weight:600;font-size:13.5px">@DownPayment.Date</div>
+            <div style="color:var(--text-muted);font-size:12px;margin-top:2px">Received via @DownPayment.Account</div>
+        </div>
+        <div style="text-align:right">
+            <div style="font-weight:700;font-size:15px;color:var(--success);font-variant-numeric:tabular-nums">@UiFormat.Money(DownPayment.Amount)</div>
+            <span class="pill success" style="margin-top:4px" data-i18n="pill-received">Received</span>
+        </div>
+    </div>
+}
+
+@if (Mobile)
+{
+    @foreach (var installment in Installments)
+    {
+        <div class="m-tl">
+            <div class="m-tl-dot @installment.Status">@DotContent(installment)</div>
+            <div class="m-tl-body">
+                <div class="mn">Installment #@installment.Number</div>
+                <div class="ms">@installment.Due@MobileNote(installment)</div>
+            </div>
+            <div class="m-tl-right">
+                <div class="amt" style="@AmountColor(installment)">@UiFormat.Money(installment.Amount)</div>
+                <div class="s">@installment.Status</div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="timeline" style="padding-top:8px">
+        @for (var index = 0; index < Installments.Count; index++)
+        {
+            var installment = Installments[index];
+            var isLast = index == Installments.Count - 1;
+            <div class="tl-item">
+                <div class="tl-dot-col">
+                    <div class="tl-dot @installment.Status">@DotContent(installment)</div>
+                    @if (!isLast)
+                    {
+                        <div class="tl-line"></div>
+                    }
+                </div>
+                <div class="tl-body">
+                    <div class="inst-no">Installment #@installment.Number</div>
+                    <div class="date-label">@installment.Due</div>
+                    <div class="date-sub" style="@DateSubColor(installment)">@DescriptionLine(installment)</div>
+                    @if (!string.IsNullOrWhiteSpace(installment.Account))
+                    {
+                        <div style="margin-top:6px"><span class="pill neutral" style="font-size:11px">@installment.Account</span></div>
+                    }
+                </div>
+                <div class="tl-right">
+                    <div class="tl-amount" style="@AmountColor(installment)">@UiFormat.Money(installment.Amount)</div>
+                    @StatusPill(installment)
+                    @if (installment.Status is "due" or "overdue")
+                    {
+                        <div class="tl-actions">
+                            <button class="btn small primary" style="font-size:12px;padding:5px 10px" data-i18n="btn-pay-now" @onclick="() => PayNow.InvokeAsync(installment)">Pay Now</button>
+                        </div>
+                    }
+                    else if (installment.Status == "paid")
+                    {
+                        <div class="tl-actions"><button class="icon-btn" title="View receipt">@UiIcons.Note</button></div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<InstallmentItem> Installments { get; set; } = [];
+    [Parameter] public DownPaymentItem? DownPayment { get; set; }
+    [Parameter] public bool Mobile { get; set; }
+    [Parameter] public EventCallback<InstallmentItem> PayNow { get; set; }
+
+    private static RenderFragment DotContent(InstallmentItem installment) => builder =>
+    {
+        if (installment.Status == "paid")
+        {
+            builder.AddContent(0, UiIcons.Check);
+            return;
+        }
+
+        builder.AddContent(1, installment.Number);
+    };
+
+    private static string DescriptionLine(InstallmentItem installment)
+    {
+        if (installment.Status == "paid" && !string.IsNullOrWhiteSpace(installment.PaidAt))
+        {
+            var lateText = installment.LateDays is > 0 ? $" - {installment.LateDays} days late" : string.Empty;
+            return $"Paid {installment.PaidAt}{lateText}";
+        }
+
+        return installment.Note ?? "Scheduled";
+    }
+
+    private static string MobileNote(InstallmentItem installment)
+    {
+        return string.IsNullOrWhiteSpace(installment.Note) ? string.Empty : $" - {installment.Note}";
+    }
+
+    private static string DateSubColor(InstallmentItem installment) => installment.Status switch
+    {
+        "due" => "color:var(--amber)",
+        "overdue" => "color:var(--danger)",
+        "upcoming" => "color:var(--text-dim)",
+        _ => string.Empty
+    };
+
+    private static string AmountColor(InstallmentItem installment) => installment.Status switch
+    {
+        "paid" => "color:var(--success)",
+        "due" => "color:var(--amber)",
+        "overdue" => "color:var(--danger)",
+        _ => "color:var(--text-muted)"
+    };
+
+    private static RenderFragment StatusPill(InstallmentItem installment) => builder =>
+    {
+        var (css, key, label) = installment.Status switch
+        {
+            "paid" => ("success", "pill-paid", "Paid"),
+            "due" => ("amber", "pill-pending", "Pending"),
+            "overdue" => ("danger", "pill-overdue", "Overdue"),
+            _ => ("neutral", "pill-upcoming", "Upcoming")
+        };
+
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", $"pill {css}");
+        builder.AddAttribute(2, "data-i18n", key);
+        builder.AddContent(3, label);
+        builder.CloseElement();
+    };
+}

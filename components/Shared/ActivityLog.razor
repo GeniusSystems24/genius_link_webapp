@@ -1,0 +1,21 @@
+@if (Wrap)
+{
+    <div class="activity">
+        @foreach (var item in Items)
+        {
+            <ActivityLogItem Item="item" />
+        }
+    </div>
+}
+else
+{
+    @foreach (var item in Items)
+    {
+        <ActivityLogItem Item="item" />
+    }
+}
+
+@code {
+    [Parameter] public IReadOnlyList<ActivityItem> Items { get; set; } = [];
+    [Parameter] public bool Wrap { get; set; } = true;
+}

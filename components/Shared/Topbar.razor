@@ -1,0 +1,59 @@
+<div class="topbar">
+    <a class="brand" href="@BrandHref">
+        <div class="brand-mark">@BrandMark</div>
+        <span>@BrandText</span>
+    </a>
+    <div class="crumbs">
+        @for (var index = 0; index < Crumbs.Count; index++)
+        {
+            var crumb = Crumbs[index];
+            if (!string.IsNullOrWhiteSpace(crumb.Href))
+            {
+                <a href="@crumb.Href" data-i18n="@crumb.I18nKey">@crumb.Label</a>
+            }
+            else
+            {
+                <span data-i18n="@crumb.I18nKey">@crumb.Label</span>
+            }
+
+            if (index < Crumbs.Count - 1)
+            {
+                @ArrowIcon
+            }
+        }
+    </div>
+    <div class="topbar-spacer"></div>
+    @if (ShowViewToggle)
+    {
+        <div class="view-toggle">
+            <button id="view-desktop" class="active" data-view="desktop">@DesktopIcon<span>Desktop</span></button>
+            <button id="view-mobile" data-view="mobile">@MobileIcon<span>Mobile</span></button>
+        </div>
+    }
+    @if (ShowLanguageToggle)
+    {
+        <button class="lang-toggle" id="lang-toggle">@LanguageIcon<span id="lang-label">@LanguageLabel</span></button>
+    }
+    @if (ShowThemeToggle)
+    {
+        <button class="theme-toggle" id="theme-toggle">@ThemeIcon<span id="theme-label">@ThemeLabel</span></button>
+    }
+</div>
+
+@code {
+    [Parameter] public string BrandHref { get; set; } = "/invoice-list";
+    [Parameter] public string BrandText { get; set; } = "Ledgerly";
+    [Parameter] public string BrandMark { get; set; } = "L";
+    [Parameter] public IReadOnlyList<BreadcrumbItem> Crumbs { get; set; } = [];
+    [Parameter] public bool ShowViewToggle { get; set; } = true;
+    [Parameter] public bool ShowLanguageToggle { get; set; } = true;
+    [Parameter] public bool ShowThemeToggle { get; set; } = true;
+    [Parameter] public string LanguageLabel { get; set; } = "Arabic";
+    [Parameter] public string ThemeLabel { get; set; } = "Light";
+
+    private static readonly MarkupString DesktopIcon = new("<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"2\" y=\"4\" width=\"20\" height=\"13\" rx=\"2\"/><path d=\"M8 21h8M12 17v4\"/></svg>");
+    private static readonly MarkupString MobileIcon = new("<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"6\" y=\"2\" width=\"12\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>");
+    private static readonly MarkupString LanguageIcon = new("<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 3a15 15 0 010 18M3 12h18\"/></svg>");
+    private static readonly MarkupString ThemeIcon = new("<svg id=\"theme-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41\"/></svg>");
+    private static readonly MarkupString ArrowIcon = new("<svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 6l6 6-6 6\"/></svg>");
+}

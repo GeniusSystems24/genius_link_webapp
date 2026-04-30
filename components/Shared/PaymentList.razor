@@ -1,0 +1,32 @@
+@if (Payments.Count > 0)
+{
+    @foreach (var payment in Payments)
+    {
+        <div class="act-item">
+            <div class="act-icon payment">@UiIcons.Check</div>
+            <div class="act-body">
+                <div class="at">@UiFormat.Money(payment.Amount) - @payment.Reference @payment.Label</div>
+                <div class="ts">@payment.Date - @payment.Account</div>
+            </div>
+        </div>
+    }
+}
+
+@if (Notes.Count > 0)
+{
+    @foreach (var note in Notes)
+    {
+        <div class="act-item">
+            <div class="act-icon note">@UiIcons.Note</div>
+            <div class="act-body">
+                <div class="at" data-i18n="@note.Key">@(note.Text ?? note.Key)</div>
+                <div class="ts">@note.Date - @note.Author</div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public IReadOnlyList<PaymentListItem> Payments { get; set; } = [];
+    [Parameter] public IReadOnlyList<NoteListItem> Notes { get; set; } = [];
+}

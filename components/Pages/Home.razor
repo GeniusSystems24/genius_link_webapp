@@ -6,7 +6,7 @@
 <main style="font-family:system-ui,sans-serif;padding:32px">
     <h1>Genius Link</h1>
     <p>Opening the invoice list...</p>
-    <p><a href="Invoice List.html">Open invoice list</a></p>
+    <p><a href="/invoice-list">Open invoice list</a></p>
 </main>
 
 @code {
@@ -14,7 +14,7 @@
     {
         if (firstRender)
         {
-            Navigation.NavigateTo("Invoice List.html", forceLoad: true);
+            Navigation.NavigateTo("/invoice-list", forceLoad: true);
         }
     }
 }

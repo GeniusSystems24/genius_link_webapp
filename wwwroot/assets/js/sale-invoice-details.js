@@ -28,6 +28,9 @@ function tr(key) { return window.AppI18n ? window.AppI18n.t(key) : key; }
 function fmt(n) { return AppFormat.money(Number(n) || 0); }
 function isCash(inv) { return inv && inv.type === 'cash'; }
 function cashTotal(inv) { return inv.totals.displayedTotal ?? inv.totals.invoiceTotal; }
+function route(name, fallback) {
+  return (window.GeniusRoutes && window.GeniusRoutes[name]) || fallback;
+}
 
 function requestedVariant() {
   const params = new URLSearchParams(window.location.search);
@@ -111,14 +114,14 @@ function renderPageActions(inv) {
         { key: 'btn-void', icon: ICONS.void, variant: 'ghost', onclick: "openSheet('sheet-void')" },
         { key: 'btn-print-receipt', icon: ICONS.print, onclick: 'window.print()' },
         { key: 'btn-email-receipt', icon: ICONS.mail, onclick: "openSheet('sheet-email')" },
-        { key: 'btn-new-invoice', icon: ICONS.plus, href: 'Create Sale Invoice.html' },
+        { key: 'btn-new-invoice', icon: ICONS.plus, href: route('createSaleInvoice', '/create-sale-invoice') },
         { key: 'btn-refund', icon: ICONS.refund, variant: 'danger', onclick: "openSheet('sheet-refund')" },
       ]
     : [
         { key: 'btn-void', icon: ICONS.void, variant: 'ghost', onclick: "openSheet('sheet-void')", title: 'Void invoice' },
         { key: 'btn-print', icon: ICONS.print, onclick: 'window.print()' },
-        { key: 'btn-edit', icon: ICONS.edit, href: 'Create Sale Invoice.html' },
-        { key: 'btn-record-payment', icon: ICONS.check, variant: 'primary', href: 'Record Payment.html' },
+        { key: 'btn-edit', icon: ICONS.edit, href: route('createSaleInvoice', '/create-sale-invoice') },
+        { key: 'btn-record-payment', icon: ICONS.check, variant: 'primary', href: route('recordPayment', '/record-payment') },
       ];
   setHtml('page-actions', actions.map(a => actionHtml(a)).join(''));
 }

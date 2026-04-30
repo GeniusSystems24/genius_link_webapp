@@ -1,0 +1,40 @@
+@if (Mobile)
+{
+    <div class="m-je-list">
+        @foreach (var entry in Entries)
+        {
+            var isDebit = entry.Debit is not null;
+            <div class="m-je-row">
+                <div class="m-je-top">
+                    <div>
+                        <div class="m-je-kind">@(isDebit ? "DR" : "CR")</div>
+                        <div class="m-je-acc">@entry.Account</div>
+                        <div class="m-je-code mono">@entry.Code</div>
+                    </div>
+                    <div class="m-je-amt @(isDebit ? "dr" : "cr")">@UiFormat.Money(isDebit ? entry.Debit : entry.Credit)</div>
+                </div>
+                <div class="m-je-desc">@entry.Description</div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    @foreach (var entry in Entries)
+    {
+        <tr class="@(entry.Highlight ? "highlight" : null)">
+            <td>
+                <div class="acc">@entry.Account</div>
+                <div class="acc-code mono">@entry.Code</div>
+            </td>
+            <td>@entry.Description</td>
+            <td class="@(entry.Debit is not null ? "dr" : "empty")">@UiFormat.Money(entry.Debit)</td>
+            <td class="@(entry.Credit is not null ? "cr" : "empty")">@UiFormat.Money(entry.Credit)</td>
+        </tr>
+    }
+}
+
+@code {
+    [Parameter] public IReadOnlyList<JournalEntryItem> Entries { get; set; } = [];
+    [Parameter] public bool Mobile { get; set; }
+}

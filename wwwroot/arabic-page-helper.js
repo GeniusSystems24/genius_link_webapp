@@ -1,9 +1,13 @@
 (function () {
+  function route(name, fallback) {
+    return (window.GeniusRoutes && window.GeniusRoutes[name]) || fallback;
+  }
+
   const ROUTES = {
-    installment: 'Sale Invoice Details.html',
-    credit: 'Sale Invoice Details.html',
-    advance: 'Sale Invoice Details.html',
-    cash: 'Sale Invoice Details.html?type=cash',
+    installment: route('saleInvoiceDetails', '/sale-invoice-details'),
+    credit: route('saleInvoiceDetails', '/sale-invoice-details'),
+    advance: route('saleInvoiceDetails', '/sale-invoice-details'),
+    cash: route('saleInvoiceDetailsCash', '/sale-invoice-details-cash'),
     paidCashRefs: new Set(['INV-2023-014', 'INV-2023-031', 'INV-2023-042', 'INV-2023-055']),
   };
 
@@ -479,17 +483,17 @@
   }
 
   function patchNavigation() {
-    document.querySelectorAll('.crumbs a[href="Create Sale Invoice.html"]').forEach((a) => {
-      a.href = 'Invoice List.html';
+    document.querySelectorAll('.crumbs a[href="/create-sale-invoice"]').forEach((a) => {
+      a.href = route('invoiceList', '/invoice-list');
     });
 
     document.querySelectorAll('button, a').forEach((el) => {
       const label = el.textContent.replace(/\s+/g, ' ').trim();
       if (label === 'Record Payment' || label === 'تسجيل دفعة') {
-        if (el.tagName === 'A') el.href = 'Record Payment.html';
+        if (el.tagName === 'A') el.href = route('recordPayment', '/record-payment');
         else el.addEventListener('click', (event) => {
           event.preventDefault();
-          window.location.href = 'Record Payment.html';
+          window.location.href = route('recordPayment', '/record-payment');
         });
       }
     });
@@ -498,7 +502,7 @@
       el.style.cursor = 'pointer';
       el.addEventListener('click', (event) => {
         if (event.target.closest('a,button')) return;
-        window.location.href = 'Customer Profile.html';
+        window.location.href = route('customerProfile', '/customer-profile');
       });
     });
 
@@ -528,7 +532,7 @@
     if (cancelButton && !cancelButton.dataset.linkedCancel) {
       cancelButton.dataset.linkedCancel = '1';
       cancelButton.addEventListener('click', () => {
-        window.location.href = 'Invoice List.html';
+        window.location.href = route('invoiceList', '/invoice-list');
       });
     }
 

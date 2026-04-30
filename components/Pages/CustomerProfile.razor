@@ -1,20 +1,18 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Customer Profile</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/app.css">
-<link rel="stylesheet" href="assets/css/customer-profile.css">
-</head>
-<body data-view="desktop">
+@page "/customer-profile"
 
-<!-- Topbar (rendered by components/topbar.js) -->
+<PageTitle>Customer Profile</PageTitle>
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/app.css" />
+    <link rel="stylesheet" href="assets/css/customer-profile.css" />
+</HeadContent>
+
+<!-- Topbar -->
 <div data-component="topbar"
-     data-brand-href="Invoice List.html"
-     data-crumbs='[{"label":"Customers","href":"Invoice List.html","key":"nav-customers"},{"label":"Alex Thompson"}]'></div>
+     data-brand-href="/invoice-list"
+     data-crumbs='[{"label":"Customers","href":"/invoice-list","key":"nav-customers"},{"label":"Alex Thompson"}]'></div>
 
 <!-- =================== DESKTOP =================== -->
 <div class="desktop-wrap">
@@ -30,7 +28,7 @@
           <div class="hero-name" id="cust-name">Alex Thompson</div>
           <div class="hero-sub">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span id="cust-email">alex.thompson@example.com</span>
+            <span id="cust-email">alex.thompson@@example.com</span>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.87 1.18 2 2 0 012.85 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
             <span id="cust-phone">+1 555 010 2233</span>
             <span style="color:var(--text-dim)">·</span>
@@ -47,8 +45,8 @@
       <div class="hero-actions">
         <button class="btn small"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07"/></svg><span data-i18n="btn-call">Call</span></button>
         <button class="btn small"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span data-i18n="btn-email">Email</span></button>
-        <a href="Create Sale Invoice.html" class="btn small primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-invoice">New Invoice</span></a>
-        <a href="Record Payment.html" class="btn small"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg><span data-i18n="btn-record-payment">Record Payment</span></a>
+        <a href="/create-sale-invoice" class="btn small primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-invoice">New Invoice</span></a>
+        <a href="/record-payment" class="btn small"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg><span data-i18n="btn-record-payment">Record Payment</span></a>
       </div>
     </div>
   </div>
@@ -67,7 +65,7 @@
           <div class="card-title" data-i18n="card-inv-history">Invoice History</div>
           <div style="display:flex;gap:8px;align-items:center">
             <span class="pill neutral"><span id="inv-count">14</span> <span data-i18n="invoices-count">invoices</span></span>
-            <a href="Invoice List.html" class="btn link small" data-i18n="btn-view-all">View All</a>
+            <a href="/invoice-list" class="btn link small" data-i18n="btn-view-all">View All</a>
           </div>
         </div>
         <div class="inv-thead">
@@ -111,7 +109,7 @@
         <div class="sc-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg><span data-i18n="card-account-balance">Account Balance</span></div>
         <div class="sc-body">
           <div id="balance-info-rows"></div>
-          <div style="margin-top:10px"><a href="Record Payment.html" class="btn primary" style="width:100%;justify-content:center">
+          <div style="margin-top:10px"><a href="/record-payment" class="btn primary" style="width:100%;justify-content:center">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
             <span data-i18n="btn-record-payment">Record Payment</span>
           </a></div>
@@ -165,7 +163,7 @@
         </div>
         <div class="m-info">
           <div class="m-name" id="m-cust-name-2">Alex Thompson</div>
-          <div class="m-sub" id="m-cust-sub">alex.thompson@example.com · +1 555 010 2233</div>
+          <div class="m-sub" id="m-cust-sub">alex.thompson@@example.com · +1 555 010 2233</div>
           <div class="m-tags">
             <span class="pill neutral" data-i18n="pill-retail">Retail</span>
             <span class="pill gold">★ Gold</span>
@@ -177,8 +175,8 @@
       <div class="m-stats-grid" id="m-customer-stats"></div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <a href="Create Sale Invoice.html" class="btn primary" style="justify-content:center;font-size:13px"><span data-i18n="btn-new-invoice">New Invoice</span></a>
-        <a href="Record Payment.html" class="btn" style="justify-content:center;font-size:13px"><span data-i18n="btn-record-payment">Record Payment</span></a>
+        <a href="/create-sale-invoice" class="btn primary" style="justify-content:center;font-size:13px"><span data-i18n="btn-new-invoice">New Invoice</span></a>
+        <a href="/record-payment" class="btn" style="justify-content:center;font-size:13px"><span data-i18n="btn-record-payment">Record Payment</span></a>
       </div>
 
       <div class="m-card">
@@ -203,7 +201,7 @@
 
     <div class="mobile-footer">
       <button class="btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16"/></svg><span data-i18n="btn-statement">Statement</span></button>
-      <a href="Record Payment.html" class="btn primary" style="justify-content:center">
+      <a href="/record-payment" class="btn primary" style="justify-content:center">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
         <span data-i18n="btn-record-payment">Record Payment</span>
       </a>
@@ -211,25 +209,12 @@
   </div>
 </div>
 
-<!-- Shared scripts: theme, view, i18n, format, data loader -->
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/view.js"></script>
 <script src="assets/js/i18n.js"></script>
 <script src="assets/js/format.js"></script>
 <script src="assets/js/data-loader.js"></script>
 <script src="assets/js/app-bootstrap.js"></script>
-
-<!-- Components -->
-<script src="components/topbar.js"></script>
-<script src="components/status-badge.js"></script>
-<script src="components/inv-type-pill.js"></script>
-<script src="components/invoice-row.js"></script>
-<script src="components/stats-strip.js"></script>
-<script src="components/payment-list.js"></script>
-<script src="components/info-rows.js"></script>
-
-<!-- Page logic -->
+<script src="assets/js/components.js"></script>
 <script src="assets/js/customer-profile.js"></script>
 <script src="arabic-page-helper.js"></script>
-</body>
-</html>

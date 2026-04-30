@@ -1,0 +1,59 @@
+@if (Mobile)
+{
+    @foreach (var product in Products)
+    {
+        <div class="m-prod">
+            <div class="m-prod-icon">@ProductIcon(product)</div>
+            <div>
+                <div style="font-weight:600;font-size:13.5px">@product.Name</div>
+                <div style="font-size:11.5px;color:var(--text-dim)">Qty @product.Quantity - @UiFormat.Money(product.Price) ea</div>
+            </div>
+            @if (product.Discount is not null and not 0)
+            {
+                <div style="text-align:right">
+                    <div style="font-weight:700;font-variant-numeric:tabular-nums">@UiFormat.Money(product.Total)</div>
+                    <span class="pill danger" style="font-size:10px">@SignedMoney(product.Discount.Value)</span>
+                </div>
+            }
+            else
+            {
+                <div style="font-weight:700;font-variant-numeric:tabular-nums">@UiFormat.Money(product.Total)</div>
+            }
+        </div>
+    }
+}
+else
+{
+    @foreach (var product in Products)
+    {
+        <div class="ptrow">
+            <div class="pname">
+                <div class="pthumb">@ProductIcon(product)</div>
+                <div>
+                    <div class="pt">@product.Name</div>
+                    <div class="ps mono">@SkuLine(product)</div>
+                </div>
+            </div>
+            <div class="num">@product.Quantity</div>
+            <div class="num">@UiFormat.Money(product.Price)</div>
+            @if (product.Discount is not null and not 0)
+            {
+                <div><span class="pill danger">@SignedMoney(product.Discount.Value)</span></div>
+            }
+            else
+            {
+                <div>-</div>
+            }
+            <div class="num" style="text-align:right;font-weight:700">@UiFormat.Money(product.Total)</div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public IReadOnlyList<ProductLine> Products { get; set; } = [];
+    [Parameter] public bool Mobile { get; set; }
+
+    private static string ProductIcon(ProductLine product) => string.IsNullOrWhiteSpace(product.Icon) ? "Box" : product.Icon;
+    private static string SkuLine(ProductLine product) => string.IsNullOrWhiteSpace(product.SkuSub) ? product.Sku : $"{product.Sku} - {product.SkuSub}";
+    private static string SignedMoney(decimal value) => $"{(value < 0 ? "-" : "+")}{UiFormat.Money(Math.Abs(value))}";
+}

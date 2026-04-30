@@ -1,0 +1,89 @@
+@switch (Variant)
+{
+    case InvoiceRowVariant.History:
+        <div class="td"><span class="inv-ref">@Item.Reference</span></div>
+        <div class="td" style="color:var(--text-muted);font-size:12.5px">@Item.Date</div>
+        <div class="td"><InvoiceTypePill Type="@Item.Type" /></div>
+        <div class="td num" style="font-weight:600">@UiFormat.Money(Item.Total)</div>
+        <div class="td num" style="@BalanceStyle">@BalanceText</div>
+        <div class="td"><StatusBadge Status="@Item.Status" /></div>
+        break;
+
+    case InvoiceRowVariant.Mobile:
+        <div class="top">
+            <span class="inv-ref">@Item.Reference</span>
+            <span style="font-size:11.5px;color:var(--text-dim)">@Item.Date</span>
+        </div>
+        <div class="mid">
+            <div class="cust-av" style="@AvatarStyle">@Initial</div>
+            <div class="name">@Item.CustomerName</div>
+            <span style="margin-left:auto"><StatusBadge Status="@Item.Status" /></span>
+        </div>
+        <div class="bottom">
+            <div class="total">@UiFormat.Money(Item.Total)</div>
+            <div class="bar-wrap">
+                <div class="bar"><div class="bar-fill" style="width:@PaidPercent%"></div></div>
+                <div style="font-size:10.5px;color:var(--text-dim);margin-top:3px">@PaidPercent% paid</div>
+            </div>
+            <div style="@MobileBalanceStyle"><span>@BalanceText</span></div>
+        </div>
+        break;
+
+    case InvoiceRowVariant.MobileHistory:
+        <div>
+            <div class="ref">@Item.Reference</div>
+            <div class="dt">@Item.Date</div>
+        </div>
+        <div style="text-align:right">
+            <div class="total">@UiFormat.Money(Item.Total)</div>
+            <StatusBadge Status="@Item.Status" Small="true" />
+        </div>
+        break;
+
+    default:
+        <div class="td"><span class="inv-ref">@Item.Reference</span></div>
+        <div class="td">
+            <div class="inv-cust">
+                <div class="cust-av" style="@AvatarStyle">@Initial</div>
+                <div>
+                    <div class="cust-nm">@Item.CustomerName</div>
+                    <div class="cust-id mono">#@Item.CustomerId</div>
+                </div>
+            </div>
+        </div>
+        <div class="td" style="color:var(--text-muted);font-size:12.5px">@Item.Date</div>
+        <div class="td"><InvoiceTypePill Type="@Item.Type" /></div>
+        <div class="td"><span class="amt">@UiFormat.Money(Item.Total)</span></div>
+        <div class="td">
+            <span class="amt pos">@UiFormat.Money(Item.Paid)</span>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:@PaidPercent%"></div></div>
+        </div>
+        <div class="td"><span class="@BalanceClass">@BalanceText</span></div>
+        <div class="td"><StatusBadge Status="@Item.Status" /></div>
+        <div class="td">
+            <div class="row-actions">
+                <button class="icon-btn" title="View" @onclick="View">@UiIcons.View</button>
+                <button class="icon-btn" title="More" @onclick="More">@UiIcons.More</button>
+            </div>
+        </div>
+        break;
+}
+
+@code {
+    [Parameter, EditorRequired] public InvoiceRowItem Item { get; set; } = new(string.Empty, string.Empty, string.Empty, "#2d5bff", string.Empty, string.Empty, 0, 0, string.Empty);
+    [Parameter] public InvoiceRowVariant Variant { get; set; }
+    [Parameter] public EventCallback<InvoiceRowItem> OnView { get; set; }
+    [Parameter] public EventCallback<InvoiceRowItem> OnMore { get; set; }
+
+    private decimal Balance => Item.Balance ?? Math.Max(0, Item.Total - Item.Paid);
+    private int PaidPercent => UiFormat.Percent(Item.Paid, Item.Total);
+    private string Initial => string.IsNullOrWhiteSpace(Item.CustomerName) ? string.Empty : Item.CustomerName[..1];
+    private string AvatarStyle => $"background:{Item.Color}";
+    private string BalanceText => Balance > 0 ? UiFormat.Money(Balance) : "-";
+    private string BalanceClass => $"amt {(Balance > 0 ? "neg" : "muted")}";
+    private string BalanceStyle => $"color:{(Balance > 0 ? "var(--danger)" : "var(--text-dim)")};font-weight:600";
+    private string MobileBalanceStyle => $"text-align:right;font-size:12px;color:{(Balance > 0 ? "var(--danger)" : "var(--text-dim)")}";
+
+    private Task View() => OnView.InvokeAsync(Item);
+    private Task More() => OnMore.InvokeAsync(Item);
+}

@@ -1,0 +1,28 @@
+@foreach (var item in Items)
+{
+    <div class="@RowClass">
+        <span class="k" data-i18n="@item.KeyI18n">@item.KeyLabel</span>
+        <span class="@ValueClass(item)" style="@item.ValueStyle">@((MarkupString)item.Value)</span>
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<InfoRowItem> Items { get; set; } = [];
+    [Parameter] public bool Mobile { get; set; }
+
+    private string RowClass => Mobile ? "m-info-row" : "q-row";
+
+    private static string ValueClass(InfoRowItem item)
+    {
+        var classes = new List<string> { "v" };
+        if (item.Mono)
+        {
+            classes.Add("mono");
+        }
+        if (!string.IsNullOrWhiteSpace(item.ValueClass))
+        {
+            classes.Add(item.ValueClass);
+        }
+        return string.Join(" ", classes);
+    }
+}

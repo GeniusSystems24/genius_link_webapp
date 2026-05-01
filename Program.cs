@@ -1,10 +1,12 @@
 using GeniusLinkWebApp.Components;
+using GeniusLinkWebApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddSingleton<DemoDataService>();
 
 var app = builder.Build();
 

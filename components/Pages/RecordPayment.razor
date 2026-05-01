@@ -1,4 +1,6 @@
 @page "/record-payment"
+@inject DemoDataService Demo
+@inject Microsoft.JSInterop.IJSRuntime JS
 
 <PageTitle>Record Payment</PageTitle>
 <HeadContent>
@@ -9,302 +11,212 @@
     <link rel="stylesheet" href="assets/css/record-payment.css" />
 </HeadContent>
 
-<!-- Topbar -->
-<div data-component="topbar"
-     data-brand-href="/invoice-list"
-     data-crumbs='[{"label":"Invoices","href":"/invoice-list","key":"nav-invoices"},{"label":"INV-2023-007","href":"/sale-invoice-details","key":"crumb-invoice"},{"label":"Record Payment","key":"crumb-record"}]'></div>
+<Topbar BrandHref="/invoice-list" Crumbs="Crumbs" />
 
-<!-- =================== DESKTOP =================== -->
 <div class="desktop-wrap">
-<main class="page">
+    <main class="page">
+        <Stepper Steps="Steps" @bind-CurrentStep="CurrentStep" />
 
-  <!-- Stepper -->
-  <div class="stepper" id="stepper">
-    <div class="step-wrap"><div class="step-circle active" id="sc-1">1</div><div class="step-label active" data-i18n="step-1">Select Invoice</div></div>
-    <div class="step-line" id="sl-1"></div>
-    <div class="step-wrap"><div class="step-circle" id="sc-2">2</div><div class="step-label" data-i18n="step-2">Payment Details</div></div>
-    <div class="step-line" id="sl-2"></div>
-    <div class="step-wrap"><div class="step-circle" id="sc-3">3</div><div class="step-label" data-i18n="step-3">Review</div></div>
-    <div class="step-line" id="sl-3"></div>
-    <div class="step-wrap"><div class="step-circle" id="sc-4">4</div><div class="step-label" data-i18n="step-4">Receipt</div></div>
-  </div>
-
-  <!-- Step 1: Select Invoice -->
-  <div class="step-panel active" id="panel-1">
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title" data-i18n="step-1-title">Select Invoice to Pay</div>
-        <div class="card-sub" data-i18n="step-1-sub">Choose one or more outstanding invoices for this customer.</div>
-      </div>
-      <div class="card-body">
-        <div class="field">
-          <label data-i18n="lbl-customer">Customer</label>
-          <div style="position:relative"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input class="input" style="padding-left:36px" value="Alex Thompson (#F-062)" data-i18n-ph="search-customer"/></div>
-        </div>
-        <div class="field">
-          <label data-i18n="lbl-outstanding">Outstanding Invoices</label>
-          <div id="inv-options"></div>
-        </div>
-        <div class="step-nav">
-          <a href="/sale-invoice-details" class="btn ghost" data-i18n="btn-cancel">Cancel</a>
-          <button class="btn primary" onclick="stepper.go(2)">
-            <span data-i18n="btn-next">Next</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 2: Payment Details -->
-  <div class="step-panel" id="panel-2">
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title" data-i18n="step-2-title">Payment Details</div>
-        <div class="card-sub" data-i18n="step-2-sub">Enter the amount, method, and account for this payment.</div>
-      </div>
-      <div class="card-body">
-        <div class="field">
-          <label data-i18n="lbl-amount">Amount</label>
-          <div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" id="pay-amount" value="20.83" inputmode="decimal" oninput="updateSummary()"/></div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn" style="font-size:12px;padding:6px 12px" onclick="setAmt('20.83')" data-i18n="btn-installment-2">Installment #2</button>
-            <button class="btn" style="font-size:12px;padding:6px 12px" onclick="setAmt('41.66')" data-i18n="btn-pay-all">Pay All ($41.66)</button>
-          </div>
+        <div class="@PanelClass(1)">
+            <div class="card">
+                <div class="card-head"><div><div class="card-title">Select Invoice to Pay</div><div class="card-sub">Choose one or more outstanding invoices for this customer.</div></div></div>
+                <div class="card-body">
+                    <div class="field"><label>Customer</label><div style="position:relative">@UiIcons.Search <input class="input" style="padding-left:36px" value="@SelectedInvoice.Customer" /></div></div>
+                    <div class="field">
+                        <label>Outstanding Invoices</label>
+                        @foreach (var invoice in PaymentData.OutstandingInvoices)
+                        {
+                            <div class="@InvoiceOptionClass(invoice)" @onclick="() => SelectInvoice(invoice)">
+                                <div class="check">@if (SelectedInvoice.Reference == invoice.Reference) { @UiIcons.Check }</div>
+                                <div class="info"><div class="ref">@invoice.Reference</div><div class="cust">@invoice.Customer</div><div class="sub">@invoice.Sub</div><div class="sub">@invoice.Note</div></div>
+                                <span class="badge">@invoice.Status</span>
+                                <div class="balance">@UiFormat.Money(invoice.Balance)</div>
+                            </div>
+                        }
+                    </div>
+                    <div class="step-nav">
+                        <a href="/sale-invoice-details" class="btn ghost">Cancel</a>
+                        <button class="btn primary" @onclick="Next">Next @UiIcons.View</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="field">
-          <label data-i18n="lbl-method">Payment Method</label>
-          <div class="seg cols3" id="pay-method-seg">
-            <button class="active" data-v="bank" data-i18n="method-bank">Bank Transfer</button>
-            <button data-v="cash" data-i18n="method-cash">Cash</button>
-            <button data-v="card" data-i18n="method-card">Card</button>
-          </div>
+        <div class="@PanelClass(2)">
+            <div class="card">
+                <div class="card-head"><div><div class="card-title">Payment Details</div><div class="card-sub">Enter the amount, method, and account for this payment.</div></div></div>
+                <div class="card-body">
+                    <div class="field">
+                        <label>Amount</label>
+                        <div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" @bind="PaymentAmount" /></div>
+                        <div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="font-size:12px;padding:6px 12px" @onclick="() => PaymentAmount = 20.83m">Installment #2</button><button class="btn" style="font-size:12px;padding:6px 12px" @onclick="() => PaymentAmount = SelectedInvoice.Balance">Pay All (@UiFormat.Money(SelectedInvoice.Balance))</button></div>
+                    </div>
+                    <div class="field"><label>Payment Method</label><div class="seg cols3">@foreach (var method in Methods) { <button class="@(PaymentMethod == method ? "active" : null)" @onclick="() => PaymentMethod = method">@method</button> }</div></div>
+                    <div class="grid2"><div class="field"><label>Account</label><select class="select" @bind="Account"><option>Main Bank Account (1002-01)</option><option>Petty Cash (1001-01)</option></select></div><div class="field"><label>Payment Date</label><input class="input" @bind="PaymentDate" /></div></div>
+                    <div class="field">
+                        <label>Allocate to Installments</label>
+                        @foreach (var allocation in PaymentData.Allocations)
+                        {
+                            <label class="@AllocationClass(allocation)">
+                                <input type="checkbox" checked="@SelectedAllocations.Contains(allocation.Label)" @onchange="eventArgs => ToggleAllocation(allocation.Label, eventArgs)" />
+                                <div class="al"><div class="t">@allocation.Label</div><div class="s">@allocation.Sub</div></div>
+                                <div class="amt">@UiFormat.Money(allocation.Amount)</div>
+                            </label>
+                        }
+                    </div>
+                    <div class="field"><label>Reference / Receipt #</label><input class="input" @bind="Reference" placeholder="e.g. BANK-TXN-20240101" /></div>
+                    <div class="field"><label>Notes</label><input class="input" @bind="Notes" placeholder="Optional..." /></div>
+                    <div class="step-nav"><button class="btn ghost" @onclick="Back">@UiIcons.View Back</button><button class="btn primary" @onclick="Next">Review @UiIcons.View</button></div>
+                </div>
+            </div>
         </div>
 
-        <div class="grid2">
-          <div class="field">
-            <label data-i18n="lbl-account">Account</label>
-            <select class="select"><option data-i18n="acct-main">Main Bank Account (1002-01)</option><option data-i18n="acct-petty">Petty Cash (1001-01)</option></select>
-          </div>
-          <div class="field">
-            <label data-i18n="lbl-date">Payment Date</label>
-            <input class="input" type="date" value="2024-01-01"/>
-          </div>
+        <div class="@PanelClass(3)">
+            <div class="card">
+                <div class="card-head"><div><div class="card-title">Review Payment</div><div class="card-sub">Confirm all details before posting the journal entry.</div></div></div>
+                <div class="card-body">
+                    <div class="grid2" style="margin-bottom:16px">
+                        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px">Invoice</div><div class="mono" style="font-weight:600;color:var(--primary)">@SelectedInvoice.Reference</div><div style="font-weight:600;margin-top:4px">@SelectedInvoice.Customer</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">@SelectedAllocationsText</div></div>
+                        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px">Payment</div><div style="font-size:22px;font-weight:700;color:var(--success);font-variant-numeric:tabular-nums">@UiFormat.Money(PaymentAmount)</div><div style="font-size:12.5px;color:var(--text-muted);margin-top:4px">@PaymentMethod - @Account</div><div style="font-size:12px;color:var(--text-dim);margin-top:2px">@PaymentDate</div></div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="s-row"><span class="k">Invoice Balance</span><span class="v">@UiFormat.Money(SelectedInvoice.Balance)</span></div>
+                        <div class="s-row"><span class="k">This Payment</span><span class="v success">@UiFormat.Money(PaymentAmount)</span></div>
+                        <div class="s-row"><span class="k">Balance After</span><span class="v danger">@UiFormat.Money(BalanceAfter)</span></div>
+                    </div>
+                    <div style="background:var(--amber-soft);border:1px solid var(--amber);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;color:var(--amber-ink)">Once confirmed, this payment will post a journal entry immediately.</div>
+                    <div class="step-nav"><button class="btn ghost" @onclick="Back">@UiIcons.View Back</button><button class="btn primary" @onclick="Next">@UiIcons.Check Confirm & Post</button></div>
+                </div>
+            </div>
         </div>
 
-        <div class="field">
-          <label data-i18n="lbl-allocate">Allocate to Installments</label>
-          <div id="alloc-items"></div>
+        <div class="@PanelClass(4)">
+            <div class="success-anim">
+                <div class="receipt">
+                    <div class="r-badge">@UiIcons.Check <span>Payment Posted</span></div>
+                    <div class="r-amount">@UiFormat.Money(PaymentAmount)</div>
+                    <div class="r-sub">Successfully recorded and posted to ledger</div>
+                    <div class="r-grid"><div class="r-cell"><div class="rl">Invoice</div><div class="rv mono">@SelectedInvoice.Reference</div></div><div class="r-cell"><div class="rl">Date</div><div class="rv">@PaymentDate</div></div><div class="r-cell"><div class="rl">Method</div><div class="rv">@PaymentMethod</div></div><div class="r-cell"><div class="rl">Remaining</div><div class="rv">@UiFormat.Money(BalanceAfter)</div></div></div>
+                </div>
+                <div class="card"><div class="card-body"><div style="text-align:center;padding:8px 0 16px"><div class="check-circle success-anim">@UiIcons.Check</div><div style="font-size:18px;font-weight:700;margin-bottom:6px">Payment Recorded Successfully</div><div style="color:var(--text-muted);font-size:13px">Journal entries have been posted automatically.</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><button class="btn" @onclick="Print">@UiIcons.Print <span>Print</span></button><a href="/sale-invoice-details" class="btn">@UiIcons.View <span>View Invoice</span></a><a href="/record-payment" class="btn primary">@UiIcons.Add <span>New Payment</span></a></div></div></div>
+            </div>
         </div>
-
-        <div class="field">
-          <label data-i18n="lbl-ref">Reference / Receipt #</label>
-          <input class="input" placeholder="e.g. BANK-TXN-20240101" data-i18n-ph="ref-ph"/>
-        </div>
-
-        <div class="field">
-          <label data-i18n="lbl-notes">Notes</label>
-          <input class="input" placeholder="Optional…" data-i18n-ph="notes-ph"/>
-        </div>
-
-        <div class="step-nav">
-          <button class="btn ghost" onclick="stepper.go(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
-          <button class="btn primary" onclick="stepper.go(3)"><span data-i18n="btn-review">Review</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 3: Review -->
-  <div class="step-panel" id="panel-3">
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title" data-i18n="step-3-title">Review Payment</div>
-        <div class="card-sub" data-i18n="step-3-sub">Confirm all details before posting the journal entry.</div>
-      </div>
-      <div class="card-body">
-        <div class="grid2" style="margin-bottom:16px">
-          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px">
-            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px" data-i18n="rev-invoice">Invoice</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--primary)">INV-2023-007</div>
-            <div style="font-weight:600;margin-top:4px">Alex Thompson</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px" data-i18n="rev-installment-due">Installment #2 due Jan 01, 2024</div>
-          </div>
-          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px">
-            <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px" data-i18n="rev-payment">Payment</div>
-            <div id="rev-amount" style="font-size:22px;font-weight:700;color:var(--success);font-variant-numeric:tabular-nums">$20.83</div>
-            <div id="rev-method" style="font-size:12.5px;color:var(--text-muted);margin-top:4px">Bank Transfer · Main Bank Account</div>
-            <div style="font-size:12px;color:var(--text-dim);margin-top:2px">Jan 01, 2024</div>
-          </div>
-        </div>
-
-        <!-- Journal preview -->
-        <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
-          <div style="padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600" data-i18n="journal-preview">Journal Entry Preview</div>
-          <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:13px;align-items:center">
-            <div><div style="font-weight:600" data-i18n="je-cash">Cash / Bank Account</div><div style="font-size:11.5px;color:var(--text-muted)" class="mono">1002-01</div></div>
-            <div style="text-align:right"><div style="color:var(--primary);font-weight:700" id="je-dr">DR $20.83</div></div>
-          </div>
-          <div style="padding:10px 14px;display:flex;justify-content:space-between;font-size:13px;align-items:center">
-            <div><div style="font-weight:600" data-i18n="je-ar">Accounts Receivable</div><div style="font-size:11.5px;color:var(--text-muted)" class="mono">1200-01</div></div>
-            <div style="text-align:right"><div style="color:var(--success);font-weight:700" id="je-cr">CR $20.83</div></div>
-          </div>
-        </div>
-
-        <!-- Balance summary -->
-        <div class="summary-box">
-          <div class="s-row"><span class="k" data-i18n="s-invoice-total">Invoice Total</span><span class="v">$92.49</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-previously-paid">Previously Paid</span><span class="v">$50.83</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-this-payment">This Payment</span><span class="v success" id="s-this">$20.83</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-balance-after">Balance After</span><span class="v danger" id="s-after">$20.83</span></div>
-        </div>
-
-        <div style="background:var(--amber-soft);border:1px solid var(--amber);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;color:var(--amber-ink)" data-i18n="review-warning">
-          Once confirmed, this payment will post a journal entry immediately. This cannot be undone without voiding the payment.
-        </div>
-
-        <div class="step-nav">
-          <button class="btn ghost" onclick="stepper.go(2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span data-i18n="btn-back">Back</span></button>
-          <button class="btn primary" onclick="stepper.go(4)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg>
-            <span data-i18n="btn-confirm-post">Confirm & Post</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 4: Receipt -->
-  <div class="step-panel" id="panel-4">
-    <div class="success-anim">
-      <div class="receipt">
-        <div class="r-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg><span data-i18n="badge-posted">Payment Posted</span></div>
-        <div class="r-amount" id="receipt-amount">$20.83</div>
-        <div class="r-sub" data-i18n="receipt-sub">Successfully recorded and posted to ledger</div>
-        <div class="r-grid">
-          <div class="r-cell"><div class="rl" data-i18n="rcpt-invoice">Invoice</div><div class="rv mono">INV-2023-007</div></div>
-          <div class="r-cell"><div class="rl" data-i18n="rcpt-date">Date</div><div class="rv">Jan 01, 2024</div></div>
-          <div class="r-cell"><div class="rl" data-i18n="rcpt-method">Method</div><div class="rv" data-i18n="method-bank">Bank Transfer</div></div>
-          <div class="r-cell"><div class="rl" data-i18n="rcpt-remaining">Remaining</div><div class="rv" id="receipt-remaining">$20.83</div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <div style="text-align:center;padding:8px 0 16px">
-            <div class="check-circle success-anim"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg></div>
-            <div style="font-size:18px;font-weight:700;margin-bottom:6px" data-i18n="success-title">Payment Recorded Successfully</div>
-            <div style="color:var(--text-muted);font-size:13px" data-i18n="success-sub">Journal entries have been posted automatically.</div>
-          </div>
-          <div class="summary-box" style="margin-bottom:20px">
-            <div class="s-row"><span class="k" data-i18n="s-invoice-total">Invoice Total</span><span class="v">$92.49</span></div>
-            <div class="s-row"><span class="k" data-i18n="s-total-paid">Total Paid</span><span class="v success">$71.66</span></div>
-            <div class="s-row"><span class="k" data-i18n="s-remaining">Remaining Balance</span><span class="v danger" id="final-remaining">$20.83</span></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-            <button class="btn" onclick="window.print()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg><span data-i18n="btn-print">Print</span></button>
-            <a href="/sale-invoice-details" class="btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7-11-7-11-7z"/></svg><span data-i18n="btn-view-invoice">View Invoice</span></a>
-            <a href="/record-payment" class="btn primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="btn-new-payment">New Payment</span></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
+    </main>
 </div>
 
-<!-- =================== MOBILE =================== -->
 <div class="mobile-wrap">
-  <div class="mobile-frame">
-    <div class="m-topbar">
-      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px" onclick="if(stepper.get()>1)stepper.back()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <div style="text-align:center"><div class="m-eyebrow" data-i18n="crumb-record">Record Payment</div><h1 id="m-step-title">Select Invoice</h1></div>
-      <button style="appearance:none;border:0;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+    <div class="mobile-frame">
+        <div class="m-topbar"><button class="icon-btn" @onclick="Back">@UiIcons.View</button><div style="text-align:center"><div class="m-eyebrow">Record Payment</div><h1>@Steps[CurrentStep - 1].Label</h1></div><button class="icon-btn">@UiIcons.More</button></div>
+        <div class="m-body">
+            <Stepper Steps="Steps" @bind-CurrentStep="CurrentStep" Mobile="true" />
+            @if (CurrentStep == 1)
+            {
+                <div style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Choose outstanding invoices to pay.</div>
+                @foreach (var invoice in PaymentData.OutstandingInvoices)
+                {
+                    <div class="@InvoiceOptionClass(invoice)" @onclick="() => SelectInvoice(invoice)"><div class="check">@if (SelectedInvoice.Reference == invoice.Reference) { @UiIcons.Check }</div><div class="info"><div class="ref">@invoice.Reference</div><div class="cust">@invoice.Customer</div><div class="sub">@invoice.Sub</div></div><div class="balance">@UiFormat.Money(invoice.Balance)</div></div>
+                }
+            }
+            else if (CurrentStep == 2)
+            {
+                <div class="field"><label>Amount</label><div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" @bind="PaymentAmount" /></div></div>
+                <div class="field"><label>Payment Method</label><div class="seg cols3">@foreach (var method in Methods) { <button class="@(PaymentMethod == method ? "active" : null)" @onclick="() => PaymentMethod = method">@method</button> }</div></div>
+                <div class="field"><label>Account</label><select class="select" @bind="Account"><option>Main Bank Account (1002-01)</option><option>Petty Cash (1001-01)</option></select></div>
+                @foreach (var allocation in PaymentData.Allocations)
+                {
+                    <label class="@AllocationClass(allocation)"><input type="checkbox" checked="@SelectedAllocations.Contains(allocation.Label)" @onchange="eventArgs => ToggleAllocation(allocation.Label, eventArgs)" /><div class="al"><div class="t">@allocation.Label</div><div class="s">@allocation.Sub</div></div><div class="amt">@UiFormat.Money(allocation.Amount)</div></label>
+                }
+            }
+            else if (CurrentStep == 3)
+            {
+                <div style="background:var(--primary-soft);border:1px solid color-mix(in oklab,var(--primary) 25%,var(--border));border-radius:14px;padding:16px;margin-bottom:14px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--primary-ink);font-weight:600;margin-bottom:8px">Payment</div><div style="font-size:28px;font-weight:700;color:var(--primary-ink);font-variant-numeric:tabular-nums">@UiFormat.Money(PaymentAmount)</div><div style="font-size:12.5px;color:var(--primary-ink);opacity:.75;margin-top:4px">@PaymentMethod - @Account</div></div>
+                <div class="summary-box"><div class="s-row"><span class="k">Invoice Balance</span><span class="v">@UiFormat.Money(SelectedInvoice.Balance)</span></div><div class="s-row"><span class="k">This Payment</span><span class="v success">@UiFormat.Money(PaymentAmount)</span></div><div class="s-row"><span class="k">Balance After</span><span class="v danger">@UiFormat.Money(BalanceAfter)</span></div></div>
+            }
+            else
+            {
+                <div style="text-align:center;padding:16px 0 24px"><div class="check-circle success-anim">@UiIcons.Check</div><div style="font-size:20px;font-weight:700;margin-bottom:6px">Payment Recorded!</div><div style="color:var(--text-muted);font-size:13px">Journal entries posted automatically.</div></div>
+                <div class="receipt"><div class="r-badge">Posted</div><div class="r-amount">@UiFormat.Money(PaymentAmount)</div><div class="r-sub">@SelectedInvoice.Reference - @PaymentDate</div></div>
+            }
+        </div>
+        <div class="mobile-footer"><button class="btn" @onclick="Back">Back</button><button class="btn primary" @onclick="Next" style="justify-content:center">@(CurrentStep == 4 ? "Done" : "Next")</button></div>
     </div>
-    <div class="m-body">
-      <div class="m-stepper">
-        <div class="m-step active" id="m-sc-1">1</div><div class="m-line" id="m-sl-1"></div>
-        <div class="m-step" id="m-sc-2">2</div><div class="m-line" id="m-sl-2"></div>
-        <div class="m-step" id="m-sc-3">3</div><div class="m-line" id="m-sl-3"></div>
-        <div class="m-step" id="m-sc-4">4</div>
-      </div>
-      <!-- Mobile Step 1 -->
-      <div class="step-panel active" id="m-panel-1">
-        <div style="margin-bottom:12px;font-size:13px;color:var(--text-muted)" data-i18n="step-1-sub">Choose outstanding invoices to pay.</div>
-        <div style="position:relative;margin-bottom:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input class="input" style="padding-left:36px" placeholder="Search customer…"/></div>
-        <div id="m-inv-options"></div>
-      </div>
-      <!-- Mobile Step 2 -->
-      <div class="step-panel" id="m-panel-2">
-        <div class="field"><label data-i18n="lbl-amount">Amount</label>
-          <div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" id="m-pay-amount" value="20.83" inputmode="decimal"/></div>
-        </div>
-        <div class="field"><label data-i18n="lbl-method">Payment Method</label>
-          <div class="seg cols3">
-            <button class="active" data-i18n="method-bank">Bank</button>
-            <button data-i18n="method-cash">Cash</button>
-            <button data-i18n="method-card">Card</button>
-          </div>
-        </div>
-        <div class="field"><label data-i18n="lbl-account">Account</label><select class="select"><option data-i18n="acct-main">Main Bank Account (1002-01)</option><option data-i18n="acct-petty">Petty Cash (1001-01)</option></select></div>
-        <div class="field"><label data-i18n="lbl-date">Date</label><input class="input" type="date" value="2024-01-01"/></div>
-        <div class="field"><label data-i18n="lbl-ref">Reference</label><input class="input" placeholder="BANK-TXN-…"/></div>
-        <div id="m-alloc-items"></div>
-      </div>
-      <!-- Mobile Step 3 -->
-      <div class="step-panel" id="m-panel-3">
-        <div style="background:var(--primary-soft);border:1px solid color-mix(in oklab,var(--primary) 25%,var(--border));border-radius:14px;padding:16px;margin-bottom:14px">
-          <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--primary-ink);font-weight:600;margin-bottom:8px" data-i18n="rev-payment">Payment</div>
-          <div style="font-size:28px;font-weight:700;color:var(--primary-ink);font-variant-numeric:tabular-nums">$20.83</div>
-          <div style="font-size:12.5px;color:var(--primary-ink);opacity:.75;margin-top:4px" data-i18n="method-bank">Bank Transfer · Main Bank Account</div>
-        </div>
-        <div class="summary-box">
-          <div class="s-row"><span class="k" data-i18n="s-invoice-total">Invoice Total</span><span class="v">$92.49</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-previously-paid">Previously Paid</span><span class="v">$50.83</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-this-payment">This Payment</span><span class="v success">$20.83</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-balance-after">Balance After</span><span class="v danger">$20.83</span></div>
-        </div>
-        <div style="background:var(--amber-soft);border-radius:10px;padding:12px;margin-top:12px;font-size:12.5px;color:var(--amber-ink)" data-i18n="review-warning-short">Once confirmed, a journal entry will be posted immediately.</div>
-      </div>
-      <!-- Mobile Step 4 -->
-      <div class="step-panel" id="m-panel-4">
-        <div style="text-align:center;padding:16px 0 24px">
-          <div class="check-circle success-anim"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12l5 5 9-11"/></svg></div>
-          <div style="font-size:20px;font-weight:700;margin-bottom:6px" data-i18n="success-title">Payment Recorded!</div>
-          <div style="color:var(--text-muted);font-size:13px" data-i18n="success-sub">Journal entries posted automatically.</div>
-        </div>
-        <div style="background:linear-gradient(135deg,var(--success),color-mix(in oklab,var(--success) 70%,#0ea5e9));border-radius:16px;padding:18px;color:#fff;margin-bottom:14px;text-align:center">
-          <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;margin-bottom:8px" data-i18n="badge-posted">Posted</div>
-          <div style="font-size:34px;font-weight:700;font-variant-numeric:tabular-nums">$20.83</div>
-          <div style="opacity:.8;font-size:12.5px;margin-top:4px">INV-2023-007 · Jan 01, 2024</div>
-        </div>
-        <div class="summary-box" style="margin-bottom:14px">
-          <div class="s-row"><span class="k" data-i18n="s-total-paid">Total Paid</span><span class="v success">$71.66</span></div>
-          <div class="s-row"><span class="k" data-i18n="s-remaining">Remaining</span><span class="v danger">$20.83</span></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <a href="/sale-invoice-details" class="btn" style="justify-content:center;font-size:13px" data-i18n="btn-view-invoice">View Invoice</a>
-          <a href="/record-payment" class="btn primary" style="justify-content:center;font-size:13px" data-i18n="btn-new-payment">New Payment</a>
-        </div>
-      </div>
-    </div>
-    <div class="mobile-footer" id="m-footer">
-      <button class="btn" id="m-btn-back" onclick="stepper.back()" data-i18n="btn-back">Back</button>
-      <button class="btn primary" id="m-btn-next" onclick="stepper.next()" style="justify-content:center" data-i18n="btn-next">Next</button>
-    </div>
-  </div>
 </div>
 
-<!-- Shared scripts -->
+@code {
+    private PaymentOptionsData PaymentData = default!;
+    private PaymentInvoiceOption SelectedInvoice = default!;
+    private readonly HashSet<string> SelectedAllocations = [];
+    private int CurrentStep { get; set; } = 1;
+    private decimal PaymentAmount { get; set; } = 20.83m;
+    private string PaymentMethod { get; set; } = "Bank Transfer";
+    private string Account { get; set; } = "Main Bank Account (1002-01)";
+    private string PaymentDate { get; set; } = "2024-01-01";
+    private string Reference { get; set; } = "BANK-TXN-20240101";
+    private string Notes { get; set; } = string.Empty;
 
-<script src="assets/js/theme.js"></script>
-<script src="assets/js/view.js"></script>
-<script src="assets/js/i18n.js"></script>
-<script src="assets/js/format.js"></script>
-<script src="assets/js/data-loader.js"></script>
-<script src="assets/js/app-bootstrap.js"></script>
-<script src="assets/js/components.js"></script>
-<script src="assets/js/record-payment.js"></script>
-<script src="arabic-page-helper.js"></script>
+    private static readonly IReadOnlyList<BreadcrumbItem> Crumbs = [new("Invoices", "/invoice-list", "nav-invoices"), new("INV-2023-007", "/sale-invoice-details"), new("Record Payment")];
+    private static readonly IReadOnlyList<StepperStep> Steps = [new(1, "step-1", "Select Invoice"), new(2, "step-2", "Payment Details"), new(3, "step-3", "Review"), new(4, "step-4", "Receipt")];
+    private static readonly IReadOnlyList<string> Methods = ["Bank Transfer", "Cash", "Card"];
+
+    protected override void OnInitialized()
+    {
+        PaymentData = Demo.GetPaymentOptions();
+        SelectedInvoice = PaymentData.OutstandingInvoices[0];
+        foreach (var allocation in PaymentData.Allocations.Where(item => item.Checked))
+        {
+            SelectedAllocations.Add(allocation.Label);
+        }
+    }
+
+    private decimal BalanceAfter => Math.Max(0, SelectedInvoice.Balance - PaymentAmount);
+    private string SelectedAllocationsText => SelectedAllocations.Count == 0 ? "No installment selected" : string.Join(", ", SelectedAllocations);
+    private string PanelClass(int step)
+    {
+        return CurrentStep == step ? "step-panel active" : "step-panel";
+    }
+
+    private string InvoiceOptionClass(PaymentInvoiceOption invoice)
+    {
+        return SelectedInvoice.Reference == invoice.Reference ? "inv-option selected" : "inv-option";
+    }
+
+    private string AllocationClass(PaymentAllocationOption allocation)
+    {
+        var selected = SelectedAllocations.Contains(allocation.Label) ? " selected" : string.Empty;
+        var overdue = allocation.Overdue ? " overdue" : string.Empty;
+        return $"alloc-item{selected}{overdue}";
+    }
+
+    private void SelectInvoice(PaymentInvoiceOption invoice)
+    {
+        SelectedInvoice = invoice;
+        PaymentAmount = Math.Min(PaymentAmount, invoice.Balance);
+    }
+
+    private void ToggleAllocation(string label, ChangeEventArgs eventArgs)
+    {
+        if (eventArgs.Value is true || string.Equals(eventArgs.Value?.ToString(), "true", StringComparison.OrdinalIgnoreCase))
+        {
+            SelectedAllocations.Add(label);
+        }
+        else
+        {
+            SelectedAllocations.Remove(label);
+        }
+    }
+
+    private void Next()
+    {
+        CurrentStep = Math.Min(4, CurrentStep + 1);
+    }
+
+    private void Back()
+    {
+        CurrentStep = Math.Max(1, CurrentStep - 1);
+    }
+
+    private async Task Print()
+    {
+        await JS.InvokeVoidAsync("GeniusApp.print");
+    }
+}

@@ -1,0 +1,406 @@
+@inject NavigationManager Navigation
+@inject Microsoft.JSInterop.IJSRuntime JS
+
+<Topbar BrandHref="/invoice-list" Crumbs="Crumbs" />
+
+<div class="desktop-wrap">
+    <main class="page">
+        <div class="page-head">
+            <div>
+                <div class="meta" style="margin:0 0 8px">
+                    <span class="status @Invoice.Status"><span class="dot"></span><span>@StatusLabel</span></span>
+                    <span class="pill neutral mono">@Invoice.Reference</span>
+                    <span class="@TypePillClass">@TypeLabel</span>
+                </div>
+                <h1>@Title</h1>
+                <div class="meta">
+                    <span style="color:var(--text-muted);font-size:13px">
+                        <span>Posted</span>
+                        <strong style="color:var(--text)">@Invoice.DatePosted</strong>
+                        @if (!IsCash)
+                        {
+                            <span>&nbsp;-&nbsp;Due&nbsp;</span>
+                            <strong style="color:var(--amber)">@DueRange</strong>
+                        }
+                    </span>
+                    @if (!IsCash)
+                    {
+                        <span class="pill amber">@PaidRatio</span>
+                    }
+                </div>
+            </div>
+            <div class="page-actions">
+                @if (IsCash)
+                {
+                <button class="btn" @onclick="Print">@UiIcons.Print <span>Print Receipt</span></button>
+                    <button class="btn" @onclick="() => ActiveSheetId = EmailSheetId">@UiIcons.Mail <span>Email Receipt</span></button>
+                    <button class="btn danger" @onclick="() => ActiveSheetId = RefundSheetId">@UiIcons.Refund <span>Refund</span></button>
+                }
+                else
+                {
+                    <a href="/record-payment" class="btn primary">@UiIcons.Check <span>Record Payment</span></a>
+                    <button class="btn" @onclick="Print">@UiIcons.Print <span>Print</span></button>
+                    <button class="btn danger" @onclick="() => ActiveSheetId = VoidSheetId">@UiIcons.Refund <span>Void</span></button>
+                }
+            </div>
+        </div>
+
+        @if (IsCash)
+        {
+            <div class="receipt-banner">
+                <div class="rb-left">
+                    <div class="rb-icon">@UiIcons.Check</div>
+                    <div><div class="rb-title">Payment received in full</div><div class="rb-sub">@Invoice.ReceiptNo - @Invoice.TransactionReference</div></div>
+                </div>
+                <div><div class="rb-amount">@UiFormat.Money(DisplayTotal)</div><div class="rb-amt-sub">Cash sale settled</div></div>
+            </div>
+        }
+
+        <div class="summary-strip">
+            @foreach (var item in SummaryItems)
+            {
+                <div class="strip-cell @item.Class">
+                    <div class="lbl">@item.Label</div>
+                    <div class="val @item.ValueClass">@item.Value</div>
+                    @if (!string.IsNullOrWhiteSpace(item.Sub))
+                    {
+                        <div class="sub">@item.Sub</div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (!IsCash)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                        <div style="font-weight:600;font-size:13.5px">Payment Progress</div>
+                        <div style="font-size:13px;color:var(--text-muted)">
+                            <strong style="color:var(--text)">@UiFormat.Money(Invoice.Totals.PaidSoFar)</strong>
+                            of @UiFormat.Money(Invoice.Totals.InvoiceTotal) collected
+                        </div>
+                    </div>
+                    <div class="pay-track"><div class="pay-fill" style="width:@Invoice.ProgressPct%"></div></div>
+                    <div class="pay-labels"><span>0%</span><span style="color:var(--success);font-weight:600">@Invoice.ProgressPct% paid</span><span>100%</span></div>
+                </div>
+            </div>
+        }
+
+        <div class="two-col">
+            <div>
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Invoice Details</div></div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            @foreach (var item in InvoiceInfo)
+                            {
+                                <div class="info-item"><div class="k">@item.KeyLabel</div><div class="v @item.ValueClass">@item.Value</div></div>
+                            }
+                        </div>
+                        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+                            <div class="k" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;margin-bottom:8px">Customer</div>
+                            <div class="cust-card">
+                                <div class="cust-avatar">@Invoice.Customer.Initial</div>
+                                <div class="cust-info">
+                                    <div class="name">@Invoice.Customer.Name</div>
+                                    <div class="sub">@CustomerSub</div>
+                                    <div class="tags">
+                                        <span class="pill neutral">@Invoice.Customer.Email</span>
+                                        <span class="pill neutral">@Invoice.Customer.Phone</span>
+                                    </div>
+                                </div>
+                                <a href="/customer-profile" class="icon-btn" style="margin-left:auto" title="View customer">@UiIcons.View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Products</div><div class="pill neutral">@Invoice.Products.Count lines</div></div>
+                    <div class="card-body" style="padding:8px 0 0">
+                        <div class="pthead"><div>Product</div><div>Qty</div><div>Unit Price</div><div>Discount</div><div style="text-align:right">Line Total</div></div>
+                        <ProductsTable Products="Invoice.Products" />
+                        <div style="padding:10px 14px;background:var(--surface-2);display:flex;justify-content:flex-end;gap:8px;align-items:center">
+                            <span style="font-size:12px;color:var(--text-muted)">Product Subtotal</span>
+                            <span style="font-weight:700;font-size:15px;font-variant-numeric:tabular-nums">@UiFormat.Money(Invoice.Totals.Subtotal)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Additional Costs & Discounts</div></div>
+                    <div class="card-body" style="padding:8px 0 0">
+                        @foreach (var cost in Invoice.AdditionalCosts)
+                        {
+                            <div class="ctrow">
+                                <div class="cl"><span class="@CostPill(cost)">@CostLabel(cost)</span>@cost.Label</div>
+                                <div class="cr" style="@AmountStyle(cost.Amount)">@SignedMoney(cost.Amount)</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (!IsCash)
+                {
+                    <div class="card">
+                        <div class="card-head"><div><div class="card-title">Installment Payment Schedule</div><div class="card-sub">Monthly plan with down payment recorded</div></div><div style="display:flex;gap:6px"><span class="pill success">@PaidCount Paid</span><span class="pill amber">@DueCount Due</span></div></div>
+                        <div class="card-body"><InstallmentTimeline Installments="Invoice.Installments" DownPayment="Invoice.DownPayment" PayNow="OpenPaySheet" /></div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">Payment Record</div><span class="pill success">Settled</span></div>
+                        <div class="card-body" style="padding:0">
+                            <div class="pay-row">
+                                <div class="pay-dot">@UiIcons.Check</div>
+                                <div class="pay-body"><div class="pt">Cash Payment - Full Amount</div><div class="ps">@Invoice.DatePosted - @Invoice.Time</div><div class="tags"><span class="pill neutral">@Invoice.CashAccountName</span><span class="pill neutral">@Invoice.ReceiptNo</span></div></div>
+                                <div class="pay-right"><div class="amt">@UiFormat.Money(DisplayTotal)</div><div class="change">Change @UiFormat.Money(Invoice.Totals.Change)</div></div>
+                            </div>
+                            <div class="change-box"><div class="cb-cell"><div class="ck">Amount Tendered</div><div class="cv">@UiFormat.Money(Invoice.Totals.Tendered)</div></div><div class="cb-cell"><div class="ck">Change Returned</div><div class="cv">@UiFormat.Money(Invoice.Totals.Change)</div></div></div>
+                        </div>
+                    </div>
+                }
+
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Journal Entries</div><div class="pill neutral">Auto-generated</div></div>
+                    <div class="card-body" style="padding:8px 0 0">
+                        <table class="je-table">
+                            <thead><tr><th>Account</th><th>Description</th><th style="text-align:right">Debit (DR)</th><th style="text-align:right">Credit (CR)</th></tr></thead>
+                            <tbody><JournalEntries Entries="Invoice.JournalEntries" /></tbody>
+                        </table>
+                        <div style="padding:10px 14px;font-size:12px;color:var(--text-dim)">@JournalNote</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Activity Log</div></div>
+                    <div class="card-body"><ActivityLog Items="Invoice.Activity" /></div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="action-card">
+                    <div class="a-body"><div class="a-title">@UiIcons.Card <span>Invoice Totals</span></div><div class="totals-stack">@foreach (var row in TotalRows) { <div class="trow-total"><span class="k">@row.Label</span><span class="@row.ValueClass">@row.Value</span></div> }<div class="trow-divider"></div><div class="grand-row"><span class="k">@GrandLabel</span><span class="v">@UiFormat.Money(GrandTotal)</span></div></div></div>
+                </div>
+                <div class="action-card">
+                    <div class="a-body">
+                        <div class="a-title">@UiIcons.Check <span>@(IsCash ? "Cash Summary" : "Payment Summary")</span></div>
+                        <InfoRows Items="PaymentSummaryRows" />
+                        @if (!IsCash)
+                        {
+                            <div style="margin-top:12px"><a href="/record-payment" class="btn primary" style="width:100%;justify-content:center">@UiIcons.Check <span>Record Payment</span></a></div>
+                        }
+                    </div>
+                </div>
+                <div class="action-card">
+                    <div class="a-body"><div class="a-title">Quick Actions</div><div class="a-row">@foreach (var action in QuickActions) { <button class="@action.Class" style="width:100%;justify-content:flex-start" @onclick="action.Callback">@action.Icon <span>@action.Label</span></button> }</div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="mobile-wrap">
+    <div class="mobile-frame">
+        <div class="m-topbar">
+            <button class="icon-btn">@UiIcons.Menu</button>
+            <div style="text-align:center"><div class="m-eyebrow">Sale Invoice</div><h1>@Invoice.Reference</h1></div>
+            <button class="icon-btn">@UiIcons.More</button>
+        </div>
+        <div class="m-body">
+            @if (IsCash)
+            {
+                <div class="m-receipt"><div class="mr-status">Paid in full</div><div class="mr-title">@Invoice.Customer.Name</div><div class="mr-ref">@Invoice.ReceiptNo</div><div class="mr-amount">@UiFormat.Money(DisplayTotal)</div><div class="mr-sub">Cash sale settled</div></div>
+            }
+            <div class="m-card">
+                <div class="m-card-body">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div><div style="font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:.1em;text-transform:uppercase">@Invoice.Customer.Name</div><div style="font-weight:700;font-size:16px;margin-top:3px">Sale Invoice</div></div><span class="status @Invoice.Status"><span class="dot"></span><span>@StatusLabel</span></span></div>
+                    <div class="m-stat-grid">@foreach (var item in SummaryItems.Take(4)) { <div class="m-stat @item.ValueClass"><div class="lbl">@item.Label</div><div class="val">@item.Value</div></div> }</div>
+                    @if (!IsCash)
+                    {
+                        <div class="pay-track" style="margin-top:12px"><div class="pay-fill" style="width:@Invoice.ProgressPct%"></div></div>
+                        <div class="pay-labels"><span>0%</span><span style="color:var(--success);font-weight:600">@Invoice.ProgressPct% paid</span><span>100%</span></div>
+                    }
+                </div>
+            </div>
+            <div class="m-card"><div class="m-card-head"><div class="m-card-title">Invoice Details</div></div><div class="m-card-body"><InfoRows Items="InvoiceInfo" Mobile="true" /></div></div>
+            <div class="m-card"><div class="m-card-head"><div class="m-card-title">Customer</div></div><div class="m-card-body"><div class="m-info-row"><span class="k">Name</span><span class="v">@Invoice.Customer.Name</span></div><div class="m-info-row"><span class="k">Phone</span><span class="v">@Invoice.Customer.Phone</span></div></div></div>
+            <div class="m-card"><div class="m-card-head"><div class="m-card-title">Products</div><span class="pill neutral">@Invoice.Products.Count items</span></div><div class="m-card-body"><ProductsTable Products="Invoice.Products" Mobile="true" /></div></div>
+            <div class="m-card"><div class="m-card-head"><div class="m-card-title">Invoice Summary</div></div><div class="m-card-body">@foreach (var row in TotalRows) { <div class="m-totrow"><span class="k">@row.Label</span><span class="v">@row.Value</span></div> }<div class="m-grand"><span class="k">@GrandLabel</span><span class="v">@UiFormat.Money(GrandTotal)</span></div></div></div>
+            @if (!IsCash)
+            {
+                <div class="m-card"><div class="m-card-head"><div class="m-card-title">Payment Schedule</div></div><div class="m-card-body"><InstallmentTimeline Installments="Invoice.Installments" Mobile="true" /></div></div>
+            }
+            <div class="m-card"><div class="m-card-head"><div class="m-card-title">Journal Entries</div></div><div class="m-card-body"><JournalEntries Entries="Invoice.JournalEntries" Mobile="true" /></div></div>
+            <div class="m-card"><div class="m-card-head"><div class="m-card-title">Activity Log</div></div><div class="m-card-body"><ActivityLog Items="Invoice.Activity" Wrap="false" /></div></div>
+        </div>
+        <div class="mobile-footer">@if (IsCash) { <button class="btn primary" style="justify-content:center" @onclick="Print">@UiIcons.Print <span>Print Receipt</span></button> } else { <a href="/record-payment" class="btn primary" style="justify-content:center">@UiIcons.Check <span>Record Payment</span></a> }</div>
+    </div>
+</div>
+
+<BottomSheets @bind-ActiveSheetId="ActiveSheetId">
+    <BottomSheet Id="@PaySheetId" Title="Record Payment" Subtitle="@($"{Invoice.Reference} - {Invoice.Customer.Name} - Balance {UiFormat.Money(Invoice.Totals.Balance)}")">
+        <ChildContent>
+            <div class="field"><label>Amount Received</label><div class="big-amount"><span class="cur">$</span><input class="input" value="@Invoice.Totals.PerInstallment.ToString("0.00")" inputmode="decimal" /></div></div>
+            <div class="field"><label>Payment Method</label><div class="seg two"><button class="active">Bank Transfer</button><button>Cash</button></div></div>
+        </ChildContent>
+        <FooterContent><button class="btn" @onclick="CloseSheets">Cancel</button><button class="btn primary" style="justify-content:center" @onclick="CloseSheets">Confirm Payment</button></FooterContent>
+    </BottomSheet>
+    <BottomSheet Id="@RefundSheetId" Title="Process Refund" Subtitle="@($"{Invoice.Reference} - {Invoice.Customer.Name}")">
+        <ChildContent>
+            <div class="s-field"><label>Refund Type</label><div class="seg two"><button class="active">Full Refund</button><button>Partial Refund</button></div></div>
+            <div class="refund-preview"><div class="r-row"><span class="rk">Invoice Total</span><span>@UiFormat.Money(DisplayTotal)</span></div><div class="r-row"><span class="rk">Refund Amount</span><span>@UiFormat.Money(DisplayTotal)</span></div></div>
+        </ChildContent>
+        <FooterContent><button class="btn" @onclick="CloseSheets">Cancel</button><button class="btn danger" style="justify-content:center" @onclick="CloseSheets">Confirm Refund</button></FooterContent>
+    </BottomSheet>
+    <BottomSheet Id="@EmailSheetId" Title="Email Receipt" Subtitle="Send a copy to the customer">
+        <ChildContent>
+            <div class="s-field"><label>Recipient Email</label><input class="input" value="@Invoice.Customer.Email" type="email" /></div>
+            <div class="s-field"><label>Subject</label><input class="input" value="@($"Your receipt from Ledgerly - {Invoice.Reference}")" /></div>
+        </ChildContent>
+        <FooterContent><button class="btn" @onclick="CloseSheets">Cancel</button><button class="btn primary" style="justify-content:center" @onclick="CloseSheets">Send Receipt</button></FooterContent>
+    </BottomSheet>
+    <BottomSheet Id="@VoidSheetId" Title="Void Invoice" Subtitle="This action cannot be undone">
+        <ChildContent>
+            <div class="void-warn"><strong>Warning:</strong> Voiding this invoice will reverse associated journal entries.</div>
+            <div class="field"><label>Void Reason</label><select class="select"><option>Customer cancelled order</option><option>Duplicate invoice</option><option>Pricing error</option><option>Other</option></select></div>
+        </ChildContent>
+        <FooterContent><button class="btn" @onclick="CloseSheets">Keep Invoice</button><button class="btn danger" style="justify-content:center" @onclick="CloseSheets">Void Invoice</button></FooterContent>
+    </BottomSheet>
+</BottomSheets>
+
+@code {
+    private const string PaySheetId = "sheet-pay";
+    private const string RefundSheetId = "sheet-refund";
+    private const string EmailSheetId = "sheet-email";
+    private const string VoidSheetId = "sheet-void";
+
+    [Parameter, EditorRequired] public InvoiceDetailData Invoice { get; set; } = default!;
+
+    private string? ActiveSheetId { get; set; }
+    private bool IsCash => Invoice.Type == "cash";
+    private decimal DisplayTotal => Invoice.Totals.DisplayedTotal > 0 ? Invoice.Totals.DisplayedTotal : Invoice.Totals.InvoiceTotal;
+    private string Title => IsCash ? $"Sale Invoice - {Invoice.Customer.Name}" : $"Sale Invoice - {Invoice.Customer.Name}";
+    private string StatusLabel => Invoice.Status switch { "paid" => "Paid in Full", "partial" => "Partially Paid", "voided" => "Voided", _ => Invoice.Status };
+    private string TypeLabel => IsCash ? "Cash Sale" : "Installment - 3x";
+    private string TypePillClass => IsCash ? "pill success" : "pill purple";
+    private string DueRange => Invoice.Installments.Count == 0 ? "-" : $"{Invoice.Installments.First().Due} - {Invoice.Installments.Last().Due}";
+    private int PaidCount => Invoice.Installments.Count(item => item.Status == "paid");
+    private int DueCount => Invoice.Installments.Count(item => item.Status is "due" or "overdue");
+    private string PaidRatio => $"{PaidCount} / {Invoice.Installments.Count} paid";
+    private string CustomerSub => Invoice.Customer.Since is null ? Invoice.Customer.Label : $"Customer #{Invoice.Customer.Id} - {Invoice.Customer.Label} since {Invoice.Customer.Since}";
+    private string JournalNote => IsCash ? "Cash sale journal entries were posted at settlement." : "Installment payments will post additional DR Cash / CR A/R entries as each is recorded.";
+    private string GrandLabel => IsCash ? "Cash Paid" : "Balance Remaining";
+    private decimal GrandTotal => IsCash ? DisplayTotal : Invoice.Totals.Balance;
+
+    private IReadOnlyList<BreadcrumbItem> Crumbs => [new("Invoices", "/invoice-list", "nav-invoices"), new(Invoice.Reference)];
+
+    private IReadOnlyList<SummaryItem> SummaryItems => IsCash
+        ? [
+            new("Sale Amount", UiFormat.Money(DisplayTotal), "success", "accent-success", "Fully settled"),
+            new("Amount Tendered", UiFormat.Money(Invoice.Totals.Tendered), "primary"),
+            new("Change Returned", UiFormat.Money(Invoice.Totals.Change), "amber"),
+            new("Balance Remaining", UiFormat.Money(Invoice.Totals.Balance), "success")
+        ]
+        : [
+            new("Invoice Total", UiFormat.Money(Invoice.Totals.InvoiceTotal), "primary"),
+            new("Paid So Far", UiFormat.Money(Invoice.Totals.PaidSoFar), "success"),
+            new("Balance Remaining", UiFormat.Money(Invoice.Totals.Balance), "danger"),
+            new("Per Installment", UiFormat.Money(Invoice.Totals.PerInstallment), "amber", Sub: "Next due Jan 01, 2024")
+        ];
+
+    private IReadOnlyList<InfoRowItem> InvoiceInfo => IsCash
+        ? [
+            new(Invoice.Store, "Store"),
+            new(Invoice.Register ?? "-", "Register"),
+            new(Invoice.ReceiptNo ?? "-", "Receipt #", Mono: true),
+            new(Invoice.CashAccountName ?? "-", "Cash Account"),
+            new(Invoice.CreatedBy, "Served By"),
+            new(Invoice.TaxScheme, "Tax Scheme")
+        ]
+        : [
+            new(Invoice.Store, "Store"),
+            new(Invoice.CreatedBy, "Created By"),
+            new(Invoice.Currency, "Currency"),
+            new(Invoice.TaxScheme, "Tax Scheme"),
+            new(Invoice.AccountCode, "A/R Account", Mono: true),
+            new(Invoice.Totals.BalanceToFinance.ToString("0.00"), "Balance to Finance", "primary")
+        ];
+
+    private IReadOnlyList<TotalRow> TotalRows => IsCash
+        ? [
+            new("Subtotal", UiFormat.Money(Invoice.Totals.Subtotal)),
+            new("Line Discount", SignedMoney(Invoice.Totals.LineDiscount), "v neg"),
+            new("Loyalty Discount", SignedMoney(Invoice.Totals.LoyaltyDiscount), "v neg"),
+            new("Tax", UiFormat.Money(Invoice.Totals.Tax), "v pos")
+        ]
+        : [
+            new("Subtotal", UiFormat.Money(Invoice.Totals.Subtotal)),
+            new("Shipping", UiFormat.Money(Invoice.Totals.Shipping), "v pos"),
+            new("Discounts", SignedMoney(Invoice.Totals.Discount), "v neg"),
+            new("Tax", UiFormat.Money(Invoice.Totals.Tax), "v pos"),
+            new("Down Payment", SignedMoney(-Invoice.Totals.DownPayment), "v neg")
+        ];
+
+    private IReadOnlyList<InfoRowItem> PaymentSummaryRows => IsCash
+        ? [
+            new(UiFormat.Money(Invoice.Totals.Tendered), "Cash Tendered"),
+            new(UiFormat.Money(Invoice.Totals.Change), "Change Given"),
+            new(Invoice.CashAccountName ?? "-", "Account")
+        ]
+        : [
+            new(UiFormat.Money(Invoice.Totals.InvoiceTotal), "Invoice Total"),
+            new(UiFormat.Money(Invoice.Totals.TotalCollected), "Total Collected", ValueClass: "success"),
+            new(UiFormat.Money(Invoice.Totals.Remaining), "Remaining", ValueClass: "danger")
+        ];
+
+    private IReadOnlyList<QuickAction> QuickActions => IsCash
+        ? [
+            new("Print Receipt", "btn", UiIcons.Print, Print),
+            new("Email Receipt", "btn", UiIcons.Mail, () => OpenSheet(EmailSheetId)),
+            new("Refund", "btn danger", UiIcons.Refund, () => OpenSheet(RefundSheetId))
+        ]
+        : [
+            new("Record Payment", "btn primary", UiIcons.Check, NavigateToPayment),
+            new("Print", "btn", UiIcons.Print, Print),
+            new("Void invoice", "btn danger", UiIcons.Refund, () => OpenSheet(VoidSheetId))
+        ];
+
+    private void OpenPaySheet(InstallmentItem _)
+    {
+        ActiveSheetId = PaySheetId;
+    }
+
+    private void CloseSheets()
+    {
+        ActiveSheetId = null;
+    }
+
+    private Task OpenSheet(string sheetId)
+    {
+        ActiveSheetId = sheetId;
+        return Task.CompletedTask;
+    }
+
+    private Task NavigateToPayment()
+    {
+        Navigation.NavigateTo("/record-payment");
+        return Task.CompletedTask;
+    }
+
+    private async Task Print()
+    {
+        await JS.InvokeVoidAsync("GeniusApp.print");
+    }
+
+    private static string CostPill(AdditionalCostLine cost) => cost.Type == "charge" ? "pill success" : "pill danger";
+    private static string CostLabel(AdditionalCostLine cost) => cost.Type == "charge" ? "Charge" : "Discount";
+    private static string AmountStyle(decimal amount) => amount < 0 ? "color:var(--danger)" : "color:var(--success)";
+    private static string SignedMoney(decimal amount) => amount < 0 ? "-" + UiFormat.Money(Math.Abs(amount)) : "+" + UiFormat.Money(amount);
+
+    private sealed record SummaryItem(string Label, string Value, string ValueClass, string? Class = null, string? Sub = null);
+    private sealed record TotalRow(string Label, string Value, string ValueClass = "v");
+    private sealed record QuickAction(string Label, string Class, MarkupString Icon, Func<Task> Callback);
+}

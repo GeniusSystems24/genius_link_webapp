@@ -44,6 +44,7 @@
   };
 
   window.addEventListener('genius:language-change', updateStaticLabels);
+  window.addEventListener('genius:ui-sync', updateStaticLabels);
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', updateStaticLabels);
   } else {

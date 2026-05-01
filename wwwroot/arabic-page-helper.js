@@ -2,6 +2,10 @@
   const storageKey = 'invoice-lang';
   const root = document.documentElement;
   const subscribers = new Set();
+  let clickBound = false;
+  let syncBound = false;
+  let observerStarted = false;
+  let syncQueued = false;
 
   function current() {
     return localStorage.getItem(storageKey) || root.lang || 'en';
@@ -12,17 +16,28 @@
     if (langLabel) langLabel.textContent = lang === 'ar' ? 'EN' : 'Arabic';
   }
 
-  function apply(lang) {
+  function setLanguage(lang, notify) {
     const next = lang === 'ar' ? 'ar' : 'en';
+    const prev = root.lang || 'en';
     root.lang = next;
     root.dir = next === 'ar' ? 'rtl' : 'ltr';
     localStorage.setItem(storageKey, next);
     updateLabels(next);
-    window.dispatchEvent(new CustomEvent('genius:language-change', { detail: { lang: next } }));
-    subscribers.forEach((fn) => {
-      try { fn(next); } catch (_) { }
-    });
+    if (notify && prev !== next) {
+      window.dispatchEvent(new CustomEvent('genius:language-change', { detail: { lang: next } }));
+      subscribers.forEach((fn) => {
+        try { fn(next); } catch (_) { }
+      });
+    }
     return next;
+  }
+
+  function apply(lang) {
+    return setLanguage(lang, true);
+  }
+
+  function sync() {
+    return setLanguage(current(), false);
   }
 
   function toggle() {
@@ -34,13 +49,42 @@
     return function unsubscribe() { subscribers.delete(fn); };
   }
 
-  function bind() {
-    apply(current());
-    document.querySelectorAll('#lang-toggle').forEach((button) => {
-      if (button.dataset.langBound) return;
-      button.dataset.langBound = '1';
-      button.addEventListener('click', toggle);
+  function requestUiSync() {
+    if (syncQueued) return;
+    syncQueued = true;
+    requestAnimationFrame(() => {
+      syncQueued = false;
+      window.dispatchEvent(new Event('genius:ui-sync'));
     });
+  }
+
+  function startObserver() {
+    if (observerStarted || !document.body) return;
+    observerStarted = true;
+    new MutationObserver(requestUiSync).observe(document.body, { childList: true, subtree: true });
+  }
+
+  function handleDocumentClick(event) {
+    if (!event.target.closest('#lang-toggle')) return;
+    event.preventDefault();
+    toggle();
+  }
+
+  function bind() {
+    sync();
+
+    if (!clickBound) {
+      clickBound = true;
+      document.addEventListener('click', handleDocumentClick);
+    }
+
+    if (!syncBound) {
+      syncBound = true;
+      window.addEventListener('genius:ui-sync', sync);
+    }
+
+    startObserver();
+    requestUiSync();
   }
 
   window.GeniusArabic = { apply, toggle, current, subscribe };

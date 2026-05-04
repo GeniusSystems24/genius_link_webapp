@@ -62,8 +62,8 @@
         <div class="td"><StatusBadge Status="@Item.Status" /></div>
         <div class="td">
             <div class="row-actions">
-                <button class="icon-btn" title="View" @onclick="View">@UiIcons.View</button>
-                <button class="icon-btn" title="More" @onclick="More">@UiIcons.More</button>
+                <button class="icon-btn" title="View" @onclick="View" @onclick:stopPropagation>@UiIcons.View</button>
+                <button class="icon-btn" title="More" @onclick="More" @onclick:stopPropagation>@UiIcons.More</button>
             </div>
         </div>
         break;

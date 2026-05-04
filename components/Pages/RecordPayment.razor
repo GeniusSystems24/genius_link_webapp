@@ -49,7 +49,7 @@
                     <div class="field">
                         <label>Amount</label>
                         <div class="big-amt-wrap"><span class="cur">$</span><input class="input big-amt" @bind="PaymentAmount" /></div>
-                        <div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="font-size:12px;padding:6px 12px" @onclick="() => PaymentAmount = 20.83m">Installment #2</button><button class="btn" style="font-size:12px;padding:6px 12px" @onclick="() => PaymentAmount = SelectedInvoice.Balance">Pay All (@UiFormat.Money(SelectedInvoice.Balance))</button></div>
+                        <div style="display:flex;gap:8px;margin-top:8px">@if (PaymentData.Allocations.Count > 0) { <button class="btn" style="font-size:12px;padding:6px 12px" @onclick="() => PaymentAmount = PaymentData.Allocations[0].Amount">@PaymentData.Allocations[0].Label</button> }<button class="btn" style="font-size:12px;padding:6px 12px" @onclick="() => PaymentAmount = SelectedInvoice.Balance">Pay All (@UiFormat.Money(SelectedInvoice.Balance))</button></div>
                     </div>
                     <div class="field"><label>Payment Method</label><div class="seg cols3">@foreach (var method in Methods) { <button class="@(PaymentMethod == method ? "active" : null)" @onclick="() => PaymentMethod = method">@method</button> }</div></div>
                     <div class="grid2"><div class="field"><label>Account</label><select class="select" @bind="Account"><option>Main Bank Account (1002-01)</option><option>Petty Cash (1001-01)</option></select></div><div class="field"><label>Payment Date</label><input class="input" @bind="PaymentDate" /></div></div>
@@ -147,7 +147,7 @@
     private PaymentInvoiceOption SelectedInvoice = default!;
     private readonly HashSet<string> SelectedAllocations = [];
     private int CurrentStep { get; set; } = 1;
-    private decimal PaymentAmount { get; set; } = 20.83m;
+    private decimal PaymentAmount { get; set; }
     private string PaymentMethod { get; set; } = "Bank Transfer";
     private string Account { get; set; } = "Main Bank Account (1002-01)";
     private string PaymentDate { get; set; } = "2024-01-01";
@@ -166,6 +166,8 @@
         {
             SelectedAllocations.Add(allocation.Label);
         }
+        var firstChecked = PaymentData.Allocations.FirstOrDefault(a => a.Checked);
+        PaymentAmount = firstChecked?.Amount ?? SelectedInvoice.Balance;
     }
 
     private decimal BalanceAfter => Math.Max(0, SelectedInvoice.Balance - PaymentAmount);

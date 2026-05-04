@@ -282,18 +282,19 @@
     private string? ActiveSheetId { get; set; }
     private bool IsCash => Invoice.Type == "cash";
     private decimal DisplayTotal => Invoice.Totals.DisplayedTotal > 0 ? Invoice.Totals.DisplayedTotal : Invoice.Totals.InvoiceTotal;
-    private string Title => IsCash ? $"Sale Invoice - {Invoice.Customer.Name}" : $"Sale Invoice - {Invoice.Customer.Name}";
+    private string Title => $"Sale Invoice - {Invoice.Customer.Name}";
     private string StatusLabel => Invoice.Status switch { "paid" => "Paid in Full", "partial" => "Partially Paid", "voided" => "Voided", _ => Invoice.Status };
-    private string TypeLabel => IsCash ? "Cash Sale" : "Installment - 3x";
+    private string TypeLabel => IsCash ? "Cash Sale" : $"Installment - {Invoice.Installments.Count}x";
     private string TypePillClass => IsCash ? "pill success" : "pill purple";
     private string DueRange => Invoice.Installments.Count == 0 ? "-" : $"{Invoice.Installments.First().Due} - {Invoice.Installments.Last().Due}";
     private int PaidCount => Invoice.Installments.Count(item => item.Status == "paid");
     private int DueCount => Invoice.Installments.Count(item => item.Status is "due" or "overdue");
     private string PaidRatio => $"{PaidCount} / {Invoice.Installments.Count} paid";
     private string CustomerSub => Invoice.Customer.Since is null ? Invoice.Customer.Label : $"Customer #{Invoice.Customer.Id} - {Invoice.Customer.Label} since {Invoice.Customer.Since}";
+    private string NextDueLabel => Invoice.Installments.FirstOrDefault(i => i.Status is "due" or "overdue" or "upcoming") is { Due: var d } ? $"Next due {d}" : string.Empty;
     private string JournalNote => IsCash ? "Cash sale journal entries were posted at settlement." : "Installment payments will post additional DR Cash / CR A/R entries as each is recorded.";
-    private string GrandLabel => IsCash ? "Cash Paid" : "Balance Remaining";
-    private decimal GrandTotal => IsCash ? DisplayTotal : Invoice.Totals.Balance;
+    private string GrandLabel => IsCash ? "Cash Paid" : "Balance to Finance";
+    private decimal GrandTotal => IsCash ? DisplayTotal : Invoice.Totals.BalanceToFinance;
 
     private IReadOnlyList<BreadcrumbItem> Crumbs => [new("Invoices", "/invoice-list", "nav-invoices"), new(Invoice.Reference)];
 
@@ -308,7 +309,7 @@
             new("Invoice Total", UiFormat.Money(Invoice.Totals.InvoiceTotal), "primary"),
             new("Paid So Far", UiFormat.Money(Invoice.Totals.PaidSoFar), "success"),
             new("Balance Remaining", UiFormat.Money(Invoice.Totals.Balance), "danger"),
-            new("Per Installment", UiFormat.Money(Invoice.Totals.PerInstallment), "amber", Sub: "Next due Jan 01, 2024")
+            new("Per Installment", UiFormat.Money(Invoice.Totals.PerInstallment), "amber", Sub: NextDueLabel)
         ];
 
     private IReadOnlyList<InfoRowItem> InvoiceInfo => IsCash
